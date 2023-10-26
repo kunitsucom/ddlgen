@@ -1,0 +1,4 @@
+*
+!.gitignore
+!gen-samples.sh
+!samples.gen.sql
