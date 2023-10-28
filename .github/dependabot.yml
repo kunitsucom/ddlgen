@@ -9,10 +9,13 @@ updates:
       timezone: "Asia/Tokyo"
     labels:
       - "build"
+      - "dependencies"
+      - "github_actions"
     assignees:
-      - "dependabot"
+      - "ginokent"
     reviewers:
       - "ginokent"
+
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
@@ -21,10 +24,13 @@ updates:
       timezone: "Asia/Tokyo"
     labels:
       - "build"
+      - "dependencies"
+      - "go"
     assignees:
-      - "dependabot"
+      - "ginokent"
     reviewers:
       - "ginokent"
+
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
@@ -33,7 +39,9 @@ updates:
       timezone: "Asia/Tokyo"
     labels:
       - "build"
+      - "dependencies"
+      - "docker"
     assignees:
-      - "dependabot"
+      - "ginokent"
     reviewers:
       - "ginokent"

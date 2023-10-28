@@ -5,8 +5,9 @@ on:
     types:
       - opened
       - edited
-      - synchronize
+      - ready_for_review
       - reopened
+      - synchronize
 
 jobs:
   check:
