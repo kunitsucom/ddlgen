@@ -14,12 +14,13 @@ import (
 	"strings"
 	"sync"
 
+	errorz "github.com/kunitsucom/util.go/errors"
+
 	"github.com/kunitsucom/ddlgen/internal/config"
 	ddlast "github.com/kunitsucom/ddlgen/internal/ddlgen/ast"
 	"github.com/kunitsucom/ddlgen/internal/ddlgen/lang/util"
 	"github.com/kunitsucom/ddlgen/internal/logs"
 	apperr "github.com/kunitsucom/ddlgen/pkg/errors"
-	errorz "github.com/kunitsucom/util.go/errors"
 )
 
 const (

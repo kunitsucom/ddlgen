@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"time"
 
+	errorz "github.com/kunitsucom/util.go/errors"
+
 	"github.com/kunitsucom/ddlgen/internal/config"
 	"github.com/kunitsucom/ddlgen/internal/contexts"
 	ddlast "github.com/kunitsucom/ddlgen/internal/ddlgen/ast"
@@ -17,7 +19,6 @@ import (
 	ddlgen_go "github.com/kunitsucom/ddlgen/internal/ddlgen/lang/go"
 	"github.com/kunitsucom/ddlgen/internal/logs"
 	apperr "github.com/kunitsucom/ddlgen/pkg/errors"
-	errorz "github.com/kunitsucom/util.go/errors"
 )
 
 //nolint:cyclop

@@ -74,12 +74,16 @@ act-check:
 	fi
 
 .PHONY: act-go-lint
-act-go-lint: act-check
+act-go-lint: act-check ## Run go-lint workflow with act
 	act pull_request --container-architecture linux/amd64 -P ubuntu-latest=catthehacker/ubuntu:act-latest -W .github/workflows/go-lint.yml
 
 .PHONY: act-go-test
-act-go-test: act-check
+act-go-test: act-check ## Run go-test workflow with act
 	act pull_request --container-architecture linux/amd64 -P ubuntu-latest=catthehacker/ubuntu:act-latest -W .github/workflows/go-test.yml
+
+.PHONY: act-go-vuln
+act-go-vuln: act-check ## Run go-vuln workflow with act
+	act pull_request --container-architecture linux/amd64 -P ubuntu-latest=catthehacker/ubuntu:act-latest -W .github/workflows/go-vuln.yml
 
 .PHONY: release
 release: ci ## Run goxz and gh release upload

@@ -1,0 +1,25 @@
+name: label-checker
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+
+jobs:
+  check:
+    name: Check labels
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: read
+      statuses: write
+    steps:
+      - uses: docker://agilepathway/pull-request-label-checker:latest # ref: https://github.com/agilepathway/label-checker/tree/master
+        with:
+          any_of: "BREAKING CHANGE,build,ci,docs,feat,fix,perf,refactor,test,chore"
+          repo_token: ${{ secrets.GITHUB_TOKEN }}

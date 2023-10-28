@@ -5,12 +5,13 @@ import (
 	"io"
 	"strconv"
 
-	ddlast "github.com/kunitsucom/ddlgen/internal/ddlgen/ast"
-	"github.com/kunitsucom/ddlgen/internal/logs"
-	"github.com/kunitsucom/ddlgen/pkg/errors"
 	errorz "github.com/kunitsucom/util.go/errors"
 	filepathz "github.com/kunitsucom/util.go/path/filepath"
 	slicez "github.com/kunitsucom/util.go/slices"
+
+	ddlast "github.com/kunitsucom/ddlgen/internal/ddlgen/ast"
+	"github.com/kunitsucom/ddlgen/internal/logs"
+	"github.com/kunitsucom/ddlgen/pkg/errors"
 )
 
 const (

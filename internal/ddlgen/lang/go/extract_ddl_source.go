@@ -6,11 +6,12 @@ import (
 	"go/token"
 	"strings"
 
+	errorz "github.com/kunitsucom/util.go/errors"
+	filepathz "github.com/kunitsucom/util.go/path/filepath"
+
 	"github.com/kunitsucom/ddlgen/internal/config"
 	"github.com/kunitsucom/ddlgen/internal/logs"
 	apperr "github.com/kunitsucom/ddlgen/pkg/errors"
-	errorz "github.com/kunitsucom/util.go/errors"
-	filepathz "github.com/kunitsucom/util.go/path/filepath"
 )
 
 //nolint:cyclop

@@ -8,9 +8,10 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/kunitsucom/ddlgen/internal/logs"
 	errorz "github.com/kunitsucom/util.go/errors"
 	"github.com/kunitsucom/util.go/flagenv"
+
+	"github.com/kunitsucom/ddlgen/internal/logs"
 )
 
 // Use a structure so that settings can be backed up.
@@ -64,7 +65,7 @@ func Load(ctx context.Context) (rollback func(), err error) {
 	return rollback, nil
 }
 
-// 将来何らかのエラーを返す可能性があるので、エラーを返せうるシグネチャにしている
+// MEMO: Since there is a possibility of returning some kind of error in the future, the signature is made to return an error.
 func load(ctx context.Context) (cfg *config, err error) { //nolint:unparam
 	fe := flagenv.NewFlagEnvSet(filepath.Base(os.Args[0]), flag.ContinueOnError)
 

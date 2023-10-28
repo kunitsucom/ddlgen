@@ -10,7 +10,7 @@ linters:
   enable-all: true
   disable:
     - depguard # unnecessary
-    - dupl # 行き過ぎた DRY を助長するため無効化
+    - dupl # disable to avoid encouraging excessive DRY
     - exhaustruct # https://github.com/GaijinEntertainment/go-exhaustruct
     - exhaustivestruct # https://github.com/mbilski/exhaustivestruct
     - gci # unnecessary
@@ -34,7 +34,7 @@ linters-settings:
   godot:
     period: false
   goimports:
-    local-prefixes: "github.com/iriam/iriam-automov3"
+    local-prefixes: "github.com/kunitsucom/ddlgen"
   wrapcheck:
     ignoreSigs:
       - func errors.New(text string) error

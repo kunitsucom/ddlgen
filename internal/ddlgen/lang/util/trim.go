@@ -3,8 +3,9 @@ package util
 import (
 	"strings"
 
-	"github.com/kunitsucom/ddlgen/internal/config"
 	slicez "github.com/kunitsucom/util.go/slices"
+
+	"github.com/kunitsucom/ddlgen/internal/config"
 )
 
 func TrimDDLGenCommentElement(stringSlice []string) []string {
