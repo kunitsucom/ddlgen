@@ -79,8 +79,8 @@ jobs:
       - name: Setup versenv
         run: |
           # Setup versenv
-          make versenv
           direnv allow ${{ env.WORKDIR }}
+          make versenv
       - uses: actions/setup-go@v4 # ref. https://github.com/actions/setup-go#usage
         id: setup-go
         with:
