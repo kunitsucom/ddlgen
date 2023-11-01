@@ -20,10 +20,10 @@ func WithNow(ctx context.Context, now time.Time) context.Context {
 }
 
 func WithNowString(ctx context.Context, layout string, value string) context.Context {
-	now, err := time.Parse(layout, value)
+	v, err := time.Parse(layout, value)
 	if err != nil {
-		now = time.Now()
+		v = time.Now()
 	}
 
-	return WithNow(ctx, now)
+	return WithNow(ctx, v)
 }

@@ -3,7 +3,7 @@ package config
 import (
 	"context"
 
-	"github.com/kunitsucom/util.go/flagenv"
+	cliz "github.com/kunitsucom/util.go/exp/cli"
 )
 
 const (
@@ -11,13 +11,13 @@ const (
 	_DefaultLanguage = "go"
 )
 
-func loadLanguage(_ context.Context, fes *flagenv.FlagEnvSet) *string {
-	v := fes.String("lang", _EnvKeyLanguage, _DefaultLanguage, "language (default: go)")
+func loadLanguage(_ context.Context, cmd *cliz.Command) string {
+	v, _ := cmd.GetStringOption(optionLanguage)
 	return v
 }
 
 func Language() string {
 	globalConfigMu.RLock()
 	defer globalConfigMu.RUnlock()
-	return *globalConfig.Language
+	return globalConfig.Language
 }

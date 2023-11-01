@@ -3,7 +3,7 @@ package config
 import (
 	"context"
 
-	"github.com/kunitsucom/util.go/flagenv"
+	cliz "github.com/kunitsucom/util.go/exp/cli"
 )
 
 const (
@@ -11,13 +11,13 @@ const (
 	_DefaultColumnKeyGo = "db"
 )
 
-func loadColumnKeyGo(_ context.Context, fes *flagenv.FlagEnvSet) *string {
-	v := fes.String("column-key-go", _EnvKeyColumnKeyGo, _DefaultColumnKeyGo, "DB column Go struct tag key (default: db)")
+func loadColumnKeyGo(_ context.Context, cmd *cliz.Command) string {
+	v, _ := cmd.GetStringOption(optionColumnKeyGo)
 	return v
 }
 
 func ColumnKeyGo() string {
 	globalConfigMu.RLock()
 	defer globalConfigMu.RUnlock()
-	return *globalConfig.ColumnKeyGo
+	return globalConfig.ColumnKeyGo
 }

@@ -3,7 +3,6 @@ package ddlgen
 import (
 	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -11,6 +10,7 @@ import (
 	"time"
 
 	errorz "github.com/kunitsucom/util.go/errors"
+	cliz "github.com/kunitsucom/util.go/exp/cli"
 
 	"github.com/kunitsucom/ddlgen/internal/config"
 	"github.com/kunitsucom/ddlgen/internal/contexts"
@@ -24,15 +24,10 @@ import (
 //nolint:cyclop
 func DDLGen(ctx context.Context) error {
 	if _, err := config.Load(ctx); err != nil {
-		if errors.Is(err, flag.ErrHelp) {
+		if errors.Is(err, cliz.ErrHelp) {
 			return nil
 		}
 		return fmt.Errorf("config.Load: %w", err)
-	}
-
-	if config.Debug() {
-		logs.Debug = logs.NewDebug()
-		logs.Debug.Print("debug mode enabled")
 	}
 
 	ctx = contexts.WithNowString(ctx, time.RFC3339, config.Timestamp())

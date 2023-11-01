@@ -3,7 +3,7 @@ package config
 import (
 	"context"
 
-	"github.com/kunitsucom/util.go/flagenv"
+	cliz "github.com/kunitsucom/util.go/exp/cli"
 )
 
 const (
@@ -11,13 +11,13 @@ const (
 	_DefaultTimestamp = ""
 )
 
-func loadTimestamp(_ context.Context, fes *flagenv.FlagEnvSet) *string {
-	v := fes.String("timestamp", _EnvKeyTimestamp, _DefaultTimestamp, "source file or directory (default: /dev/stdin)")
+func loadTimestamp(_ context.Context, cmd *cliz.Command) string {
+	v, _ := cmd.GetStringOption(optionTimestamp)
 	return v
 }
 
 func Timestamp() string {
 	globalConfigMu.RLock()
 	defer globalConfigMu.RUnlock()
-	return *globalConfig.Timestamp
+	return globalConfig.Timestamp
 }

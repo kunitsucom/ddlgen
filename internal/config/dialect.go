@@ -3,7 +3,7 @@ package config
 import (
 	"context"
 
-	"github.com/kunitsucom/util.go/flagenv"
+	cliz "github.com/kunitsucom/util.go/exp/cli"
 )
 
 const (
@@ -11,13 +11,13 @@ const (
 	_DefaultDialect = "postgres"
 )
 
-func loadDialect(_ context.Context, fes *flagenv.FlagEnvSet) *string {
-	v := fes.String("dialect", _EnvKeyDialect, _DefaultDialect, "dialect (default: postgres)")
+func loadDialect(_ context.Context, cmd *cliz.Command) string {
+	v, _ := cmd.GetStringOption(optionDialect)
 	return v
 }
 
 func Dialect() string {
 	globalConfigMu.RLock()
 	defer globalConfigMu.RUnlock()
-	return *globalConfig.Dialect
+	return globalConfig.Dialect
 }

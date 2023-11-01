@@ -3,7 +3,7 @@ package config
 import (
 	"context"
 
-	"github.com/kunitsucom/util.go/flagenv"
+	cliz "github.com/kunitsucom/util.go/exp/cli"
 )
 
 const (
@@ -11,13 +11,13 @@ const (
 	_DefaultDDLKeyGo = "ddlgen"
 )
 
-func loadDDLKeyGo(_ context.Context, fes *flagenv.FlagEnvSet) *string {
-	v := fes.String("ddl-key-go", _EnvKeyDDLKeyGo, _DefaultDDLKeyGo, "DDL Go struct tag key (default: ddl)")
+func loadDDLKeyGo(_ context.Context, cmd *cliz.Command) string {
+	v, _ := cmd.GetStringOption(optionDDLKeyGo)
 	return v
 }
 
 func DDLKeyGo() string {
 	globalConfigMu.RLock()
 	defer globalConfigMu.RUnlock()
-	return *globalConfig.DDLKeyGo
+	return globalConfig.DDLKeyGo
 }

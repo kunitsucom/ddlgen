@@ -21,7 +21,7 @@ func extractDDLSource(_ context.Context, fset *token.FileSet, f *goast.File) ([]
 		for _, commentGroup := range commentGroups {
 		CommentGroupLoop:
 			for _, commentLine := range strings.Split(strings.TrimSuffix(commentGroup.Text(), "\n"), "\n") {
-				logs.Debug.Printf("commentLine=%s: %s", filepathz.Short(fset.Position(commentGroup.Pos()).String()), commentLine)
+				logs.Trace.Printf("commentLine=%s: %s", filepathz.Short(fset.Position(commentGroup.Pos()).String()), commentLine)
 				// NOTE: (en) If the comment line matches the DDLKeyGo, it is assumed to be a comment line for the struct.
 				if matches := ddlKeyGoCommentLineRegex().FindStringSubmatch(commentLine); len(matches) > 3 {
 					r := &ddlSource{

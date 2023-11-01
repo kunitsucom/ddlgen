@@ -3,7 +3,7 @@ package config
 import (
 	"context"
 
-	"github.com/kunitsucom/util.go/flagenv"
+	cliz "github.com/kunitsucom/util.go/exp/cli"
 )
 
 const (
@@ -11,13 +11,13 @@ const (
 	_DefaultDestination = "/dev/stdout"
 )
 
-func loadDestination(_ context.Context, fes *flagenv.FlagEnvSet) *string {
-	v := fes.String("dst", _EnvKeyDestination, _DefaultDestination, "destination file or directory (default: /dev/stdout)")
+func loadDestination(_ context.Context, cmd *cliz.Command) string {
+	v, _ := cmd.GetStringOption(optionDestination)
 	return v
 }
 
 func Destination() string {
 	globalConfigMu.RLock()
 	defer globalConfigMu.RUnlock()
-	return *globalConfig.Destination
+	return globalConfig.Destination
 }

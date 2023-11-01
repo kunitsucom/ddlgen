@@ -3,14 +3,13 @@ package config
 import (
 	"context"
 	"encoding/json"
-	"flag"
-	"os"
-	"path/filepath"
 	"sync"
+	"time"
 
 	errorz "github.com/kunitsucom/util.go/errors"
-	"github.com/kunitsucom/util.go/flagenv"
+	cliz "github.com/kunitsucom/util.go/exp/cli"
 
+	"github.com/kunitsucom/ddlgen/internal/contexts"
 	"github.com/kunitsucom/ddlgen/internal/logs"
 )
 
@@ -18,15 +17,16 @@ import (
 //
 //nolint:tagliatelle
 type config struct {
-	Debug       *bool   `json:"debug"`
-	Timestamp   *string `json:"timestamp"`
-	Language    *string `json:"language"`
-	Dialect     *string `json:"dialect"`
-	Source      *string `json:"source"`
-	Destination *string `json:"destination"`
+	Trace       bool   `json:"trace"`
+	Debug       bool   `json:"debug"`
+	Timestamp   string `json:"timestamp"`
+	Language    string `json:"language"`
+	Dialect     string `json:"dialect"`
+	Source      string `json:"source"`
+	Destination string `json:"destination"`
 	// Golang
-	ColumnKeyGo *string `json:"column_key_go"`
-	DDLKeyGo    *string `json:"ddl_key_go"`
+	ColumnKeyGo string `json:"column_key_go"`
+	DDLKeyGo    string `json:"ddl_key_go"`
 }
 
 //nolint:gochecknoglobals
@@ -65,23 +65,105 @@ func Load(ctx context.Context) (rollback func(), err error) {
 	return rollback, nil
 }
 
-// MEMO: Since there is a possibility of returning some kind of error in the future, the signature is made to return an error.
-func load(ctx context.Context) (cfg *config, err error) { //nolint:unparam
-	fe := flagenv.NewFlagEnvSet(filepath.Base(os.Args[0]), flag.ContinueOnError)
+const (
+	optionTrace       = "trace"
+	optionDebug       = "debug"
+	optionTimestamp   = "timestamp"
+	optionLanguage    = "lang"
+	optionDialect     = "dialect"
+	optionSource      = "src"
+	optionDestination = "dst"
+	// Golang
+	optionColumnKeyGo = "column-key-go"
+	optionDDLKeyGo    = "ddl-key-go"
+)
 
-	c := &config{
-		Debug:       loadDebug(ctx, fe),
-		Timestamp:   loadTimestamp(ctx, fe),
-		Language:    loadLanguage(ctx, fe),
-		Dialect:     loadDialect(ctx, fe),
-		Source:      loadSource(ctx, fe),
-		Destination: loadDestination(ctx, fe),
-		ColumnKeyGo: loadColumnKeyGo(ctx, fe),
-		DDLKeyGo:    loadDDLKeyGo(ctx, fe),
+// MEMO: Since there is a possibility of returning some kind of error in the future, the signature is made to return an error.
+//
+//nolint:funlen
+func load(ctx context.Context) (cfg *config, err error) { //nolint:unparam
+	cmd := &cliz.Command{
+		Name:        "ddlgen",
+		Description: "Generate DDL from Go source code",
+		Options: []cliz.Option{
+			&cliz.BoolOption{
+				Name:        optionTrace,
+				Environment: "DDLGEN_TRACE",
+				Description: "trace mode enabled",
+				Default:     cliz.Default(false),
+			},
+			&cliz.BoolOption{
+				Name:        optionDebug,
+				Environment: "DDLGEN_DEBUG",
+				Description: "debug mode enabled",
+				Default:     cliz.Default(false),
+			},
+			&cliz.StringOption{
+				Name:        optionTimestamp,
+				Environment: "DDLGEN_TIMESTAMP",
+				Description: "timestamp format",
+				Default:     cliz.Default(time.Now().Format(time.RFC3339)),
+			},
+			&cliz.StringOption{
+				Name:        optionLanguage,
+				Environment: "DDLGEN_LANG",
+				Description: "programming language",
+			},
+			&cliz.StringOption{
+				Name:        optionDialect,
+				Environment: "DDLGEN_DIALECT",
+				Description: "SQL dialect",
+			},
+			&cliz.StringOption{
+				Name:        optionSource,
+				Environment: "DDLGEN_SOURCE",
+				Description: "source file or directory",
+			},
+			&cliz.StringOption{
+				Name:        optionDestination,
+				Environment: "DDLGEN_DESTINATION",
+				Description: "destination file or directory",
+			},
+			// Golang
+			&cliz.StringOption{
+				Name:        optionColumnKeyGo,
+				Environment: "DDLGEN_COLUMN_KEY_GO",
+				Description: "column annotation key for Go struct tag",
+				Default:     cliz.Default("db"),
+			},
+			&cliz.StringOption{
+				Name:        optionDDLKeyGo,
+				Environment: "DDLGEN_DDL_KEY_GO",
+				Description: "DDL annotation key for Go struct tag",
+				Default:     cliz.Default("ddlgen"),
+			},
+		},
 	}
 
-	if err := fe.Parse(os.Args[1:]); err != nil {
-		return nil, errorz.Errorf("flagenvSet.Parse: %w", err)
+	if _, err := cmd.Parse(contexts.Args(ctx)); err != nil {
+		return nil, errorz.Errorf("cmd.Parse: %w", err)
+	}
+
+	c := &config{
+		Trace:       loadTrace(ctx, cmd),
+		Debug:       loadDebug(ctx, cmd),
+		Timestamp:   loadTimestamp(ctx, cmd),
+		Language:    loadLanguage(ctx, cmd),
+		Dialect:     loadDialect(ctx, cmd),
+		Source:      loadSource(ctx, cmd),
+		Destination: loadDestination(ctx, cmd),
+		ColumnKeyGo: loadColumnKeyGo(ctx, cmd),
+		DDLKeyGo:    loadDDLKeyGo(ctx, cmd),
+	}
+
+	if c.Debug {
+		logs.Debug = logs.NewDebug()
+		logs.Trace.Print("debug mode enabled")
+	}
+	if c.Trace {
+		logs.Trace = logs.NewTrace()
+		logs.Debug = logs.NewDebug()
+		logs.Debug.Print("trace mode enabled")
 	}
 
 	if err := json.NewEncoder(logs.Debug).Encode(c); err != nil {

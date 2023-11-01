@@ -113,9 +113,7 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 		return nil, errorz.Errorf("searchStructTypeWithDDLKeyGoComment: %w", err)
 	}
 
-	if config.Debug() {
-		dumpDDLSource(fset, ddlSrc)
-	}
+	dumpDDLSource(fset, ddlSrc)
 
 	stmts := make([]ddlast.Stmt, 0)
 	for _, r := range ddlSrc {
@@ -190,13 +188,11 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 	}
 
 	sort.Slice(stmts, func(i, j int) bool {
-		return fmt.Sprintf("%s:%9d", stmts[i].GetSourceFile(), stmts[i].GetSourceLine()) < fmt.Sprintf("%s:%9d", stmts[j].GetSourceFile(), stmts[j].GetSourceLine())
+		return fmt.Sprintf("%s:%09d", stmts[i].GetSourceFile(), stmts[i].GetSourceLine()) < fmt.Sprintf("%s:%09d", stmts[j].GetSourceFile(), stmts[j].GetSourceLine())
 	})
 
-	if config.Debug() {
-		for i := range stmts {
-			logs.Debug.Printf("%s:%d", fmt.Sprintf("%s:%9d", stmts[i].GetSourceFile(), stmts[i].GetSourceLine()))
-		}
+	for i := range stmts {
+		logs.Trace.Print(fmt.Sprintf("%s:%09d", stmts[i].GetSourceFile(), stmts[i].GetSourceLine()))
 	}
 
 	return stmts, nil
