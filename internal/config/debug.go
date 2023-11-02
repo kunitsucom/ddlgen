@@ -6,13 +6,8 @@ import (
 	cliz "github.com/kunitsucom/util.go/exp/cli"
 )
 
-const (
-	_EnvKeyDebug  = "DEBUG"
-	_DefaultDebug = false
-)
-
 func loadDebug(_ context.Context, cmd *cliz.Command) bool {
-	v, _ := cmd.GetBoolOption(optionDebug)
+	v, _ := cmd.GetBoolOption(_OptionDebug)
 	return v
 }
 

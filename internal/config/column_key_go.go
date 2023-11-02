@@ -6,13 +6,8 @@ import (
 	cliz "github.com/kunitsucom/util.go/exp/cli"
 )
 
-const (
-	_EnvKeyColumnKeyGo  = "COLUMN_KEY_GO"
-	_DefaultColumnKeyGo = "db"
-)
-
 func loadColumnKeyGo(_ context.Context, cmd *cliz.Command) string {
-	v, _ := cmd.GetStringOption(optionColumnKeyGo)
+	v, _ := cmd.GetStringOption(_OptionColumnKeyGo)
 	return v
 }
 

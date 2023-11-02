@@ -6,13 +6,8 @@ import (
 	cliz "github.com/kunitsucom/util.go/exp/cli"
 )
 
-const (
-	_EnvKeySource  = "SOURCE"
-	_DefaultSource = "/dev/stdin"
-)
-
 func loadSource(_ context.Context, cmd *cliz.Command) string {
-	v, _ := cmd.GetStringOption(optionSource)
+	v, _ := cmd.GetStringOption(_OptionSource)
 	return v
 }
 

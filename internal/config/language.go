@@ -6,13 +6,8 @@ import (
 	cliz "github.com/kunitsucom/util.go/exp/cli"
 )
 
-const (
-	_EnvKeyLanguage  = "LANGUAGE"
-	_DefaultLanguage = "go"
-)
-
 func loadLanguage(_ context.Context, cmd *cliz.Command) string {
-	v, _ := cmd.GetStringOption(optionLanguage)
+	v, _ := cmd.GetStringOption(_OptionLanguage)
 	return v
 }
 

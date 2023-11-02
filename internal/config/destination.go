@@ -6,13 +6,8 @@ import (
 	cliz "github.com/kunitsucom/util.go/exp/cli"
 )
 
-const (
-	_EnvKeyDestination  = "DESTINATION"
-	_DefaultDestination = "/dev/stdout"
-)
-
 func loadDestination(_ context.Context, cmd *cliz.Command) string {
-	v, _ := cmd.GetStringOption(optionDestination)
+	v, _ := cmd.GetStringOption(_OptionDestination)
 	return v
 }
 

@@ -66,16 +66,34 @@ func Load(ctx context.Context) (rollback func(), err error) {
 }
 
 const (
-	optionTrace       = "trace"
-	optionDebug       = "debug"
-	optionTimestamp   = "timestamp"
-	optionLanguage    = "lang"
-	optionDialect     = "dialect"
-	optionSource      = "src"
-	optionDestination = "dst"
+	_OptionTrace = "trace"
+	_EnvKeyTrace = "DDLGEN_TRACE"
+
+	_OptionDebug = "debug"
+	_EnvKeyDebug = "DDLGEN_DEBUG"
+
+	_OptionTimestamp = "timestamp"
+	_EnvKeyTimestamp = "DDLGEN_TIMESTAMP"
+
+	_OptionLanguage = "lang"
+	_EnvKeyLanguage = "DDLGEN_LANGUAGE"
+
+	_OptionDialect = "dialect"
+	_EnvKeyDialect = "DDLGEN_DIALECT"
+
+	_OptionSource = "src"
+	_EnvKeySource = "DDLGEN_SOURCE"
+
+	_OptionDestination = "dst"
+	_EnvKeyDestination = "DDLGEN_DESTINATION"
+
 	// Golang
-	optionColumnKeyGo = "column-key-go"
-	optionDDLKeyGo    = "ddl-key-go"
+
+	_OptionColumnKeyGo = "column-key-go"
+	_EnvKeyColumnKeyGo = "DDLGEN_COLUMN_KEY_GO"
+
+	_OptionDDLKeyGo = "ddl-key-go"
+	_EnvKeyDDLKeyGo = "DDLGEN_DDL_KEY_GO"
 )
 
 // MEMO: Since there is a possibility of returning some kind of error in the future, the signature is made to return an error.
@@ -84,63 +102,66 @@ const (
 func load(ctx context.Context) (cfg *config, err error) { //nolint:unparam
 	cmd := &cliz.Command{
 		Name:        "ddlgen",
-		Description: "Generate DDL from Go source code",
+		Description: "Generate DDL from annotated source code.",
 		Options: []cliz.Option{
 			&cliz.BoolOption{
-				Name:        optionTrace,
-				Environment: "DDLGEN_TRACE",
+				Name:        _OptionTrace,
+				Environment: _EnvKeyTrace,
 				Description: "trace mode enabled",
 				Default:     cliz.Default(false),
 			},
 			&cliz.BoolOption{
-				Name:        optionDebug,
-				Environment: "DDLGEN_DEBUG",
-				Description: "debug mode enabled",
+				Name:        _OptionDebug,
+				Environment: _EnvKeyDebug,
+				Description: "debug mode",
 				Default:     cliz.Default(false),
 			},
 			&cliz.StringOption{
-				Name:        optionTimestamp,
-				Environment: "DDLGEN_TIMESTAMP",
-				Description: "timestamp format",
+				Name:        _OptionTimestamp,
+				Environment: _EnvKeyTimestamp,
+				Description: "code generation timestamp",
 				Default:     cliz.Default(time.Now().Format(time.RFC3339)),
 			},
 			&cliz.StringOption{
-				Name:        optionLanguage,
-				Environment: "DDLGEN_LANG",
-				Description: "programming language",
+				Name:        _OptionLanguage,
+				Environment: _EnvKeyLanguage,
+				Description: "programming language to generate DDL",
+				Default:     cliz.Default("go"),
 			},
 			&cliz.StringOption{
-				Name:        optionDialect,
-				Environment: "DDLGEN_DIALECT",
-				Description: "SQL dialect",
+				Name:        _OptionDialect,
+				Environment: _EnvKeyDialect,
+				Description: "SQL dialect to generate DDL",
 			},
 			&cliz.StringOption{
-				Name:        optionSource,
-				Environment: "DDLGEN_SOURCE",
+				Name:        _OptionSource,
+				Environment: _EnvKeySource,
 				Description: "source file or directory",
+				Default:     cliz.Default("/dev/stdin"),
 			},
 			&cliz.StringOption{
-				Name:        optionDestination,
-				Environment: "DDLGEN_DESTINATION",
+				Name:        _OptionDestination,
+				Environment: _EnvKeyDestination,
 				Description: "destination file or directory",
+				Default:     cliz.Default("/dev/stdout"),
 			},
 			// Golang
 			&cliz.StringOption{
-				Name:        optionColumnKeyGo,
-				Environment: "DDLGEN_COLUMN_KEY_GO",
+				Name:        _OptionColumnKeyGo,
+				Environment: _EnvKeyColumnKeyGo,
 				Description: "column annotation key for Go struct tag",
 				Default:     cliz.Default("db"),
 			},
 			&cliz.StringOption{
-				Name:        optionDDLKeyGo,
-				Environment: "DDLGEN_DDL_KEY_GO",
+				Name:        _OptionDDLKeyGo,
+				Environment: _EnvKeyDDLKeyGo,
 				Description: "DDL annotation key for Go struct tag",
 				Default:     cliz.Default("ddlgen"),
 			},
 		},
 	}
 
-	if _, err := cmd.Parse(contexts.Args(ctx)); err != nil {
+	if _, _, err := cmd.Parse(contexts.Args(ctx)); err != nil {
 		return nil, errorz.Errorf("cmd.Parse: %w", err)
 	}
 

@@ -6,13 +6,8 @@ import (
 	cliz "github.com/kunitsucom/util.go/exp/cli"
 )
 
-const (
-	_EnvKeyTimestamp  = "TIMESTAMP"
-	_DefaultTimestamp = ""
-)
-
 func loadTimestamp(_ context.Context, cmd *cliz.Command) string {
-	v, _ := cmd.GetStringOption(optionTimestamp)
+	v, _ := cmd.GetStringOption(_OptionTimestamp)
 	return v
 }
 

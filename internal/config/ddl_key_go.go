@@ -6,13 +6,8 @@ import (
 	cliz "github.com/kunitsucom/util.go/exp/cli"
 )
 
-const (
-	_EnvKeyDDLKeyGo  = "DDL_KEY_GO"
-	_DefaultDDLKeyGo = "ddlgen"
-)
-
 func loadDDLKeyGo(_ context.Context, cmd *cliz.Command) string {
-	v, _ := cmd.GetStringOption(optionDDLKeyGo)
+	v, _ := cmd.GetStringOption(_OptionDDLKeyGo)
 	return v
 }
 

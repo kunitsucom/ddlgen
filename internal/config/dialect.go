@@ -6,13 +6,8 @@ import (
 	cliz "github.com/kunitsucom/util.go/exp/cli"
 )
 
-const (
-	_EnvKeyDialect  = "DIALECT"
-	_DefaultDialect = "postgres"
-)
-
 func loadDialect(_ context.Context, cmd *cliz.Command) string {
-	v, _ := cmd.GetStringOption(optionDialect)
+	v, _ := cmd.GetStringOption(_OptionDialect)
 	return v
 }
 
