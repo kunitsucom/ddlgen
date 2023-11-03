@@ -9,41 +9,19 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"regexp"
 	"sort"
 	"strings"
-	"sync"
 
 	errorz "github.com/kunitsucom/util.go/errors"
 
 	"github.com/kunitsucom/ddlgen/internal/config"
-	ddlast "github.com/kunitsucom/ddlgen/internal/ddlgen/ast"
+	ddlast "github.com/kunitsucom/ddlgen/internal/ddlgen/ddl"
 	"github.com/kunitsucom/ddlgen/internal/ddlgen/lang/util"
 	"github.com/kunitsucom/ddlgen/internal/logs"
 	apperr "github.com/kunitsucom/ddlgen/pkg/errors"
 )
 
-const (
-	//	                                _______________________ <- 1. comment prefix
-	//	                                                         __ <- 2. tag name
-	//	                                                                 __ <- 3. tag value
-	//	                                                                         ___ <- 4. comment suffix
-	_DDLKeyGoCommentLineRegexFormat = `^(\s*//+\s*|\s*/\*\s*|\s*)(%s):\s*(.*)?\s*(\*/)?`
-)
-
-//nolint:gochecknoglobals
-var (
-	_DDLKeyGoCommentLineRegex     *regexp.Regexp
-	_DDLKeyGoCommentLineRegexOnce sync.Once
-)
-
-func ddlKeyGoCommentLineRegex() *regexp.Regexp {
-	_DDLKeyGoCommentLineRegexOnce.Do(func() {
-		_DDLKeyGoCommentLineRegex = regexp.MustCompile(fmt.Sprintf(_DDLKeyGoCommentLineRegexFormat, config.DDLKeyGo()))
-	})
-	return _DDLKeyGoCommentLineRegex
-}
-
+//nolint:cyclop
 func Parse(ctx context.Context, src string) (*ddlast.DDL, error) {
 	// MEMO: get absolute path for parser.ParseFile()
 	sourceAbs, err := filepath.Abs(src)
@@ -56,9 +34,9 @@ func Parse(ctx context.Context, src string) (*ddlast.DDL, error) {
 		return nil, errorz.Errorf("os.Stat: %w", err)
 	}
 
-	if info.IsDir() {
-		ddl := ddlast.NewDDL(ctx)
+	ddl := ddlast.NewDDL(ctx)
 
+	if info.IsDir() {
 		if err := filepath.WalkDir(sourceAbs, func(path string, d os.DirEntry, err error) error {
 			if err != nil {
 				return err //nolint:wrapcheck
@@ -74,6 +52,10 @@ func Parse(ctx context.Context, src string) (*ddlast.DDL, error) {
 
 			stmts, err := parseFile(ctx, path)
 			if err != nil {
+				if errors.Is(err, apperr.ErrDDLKeyGoNotFoundInSource) {
+					logs.Debug.Printf("parseFile: %s: %v", path, err)
+					return nil
+				}
 				return errorz.Errorf("parseFile: %w", err)
 			}
 
@@ -87,7 +69,6 @@ func Parse(ctx context.Context, src string) (*ddlast.DDL, error) {
 		return ddl, nil
 	}
 
-	ddl := ddlast.NewDDL(ctx)
 	stmts, err := parseFile(ctx, sourceAbs)
 	if err != nil {
 		return nil, errorz.Errorf("Parse: %w", err)
@@ -107,10 +88,7 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 
 	ddlSrc, err := extractDDLSource(ctx, fset, f)
 	if err != nil {
-		if errors.Is(err, apperr.ErrDDLKeyGoNotFoundInSource) {
-			return nil, nil
-		}
-		return nil, errorz.Errorf("searchStructTypeWithDDLKeyGoComment: %w", err)
+		return nil, errorz.Errorf("extractDDLSource: %w", err)
 	}
 
 	dumpDDLSource(fset, ddlSrc)
@@ -119,7 +97,7 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 	for _, r := range ddlSrc {
 		stmt := &ddlast.CreateTableStmt{}
 
-		// source (& SortKey)
+		// source
 		source := fset.Position(r.StructType.Pos())
 		stmt.SourceFile = source.Filename
 		stmt.SourceLine = source.Line
@@ -127,21 +105,19 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 		// comments
 		comments := strings.Split(strings.Trim(r.CommentGroup.Text(), "\n"), "\n")
 		for _, comment := range comments {
-			logs.Info.Printf("[COMMENT DETECTED]: %s:%d: %s", stmt.SourceFile, stmt.SourceLine, comment)
+			logs.Debug.Printf("[COMMENT DETECTED]: %s:%d: %s", stmt.SourceFile, stmt.SourceLine, comment)
 		}
 		stmt.Comments = append(stmt.Comments, util.TrimTailEmptyCommentElement(util.TrimDDLGenCommentElement(comments))...)
 
-		// CREATE TABLE / CONSTRAINT
+		// CREATE TABLE / CONSTRAINT / OPTIONS
 		for _, comment := range comments {
-			if matches := util.RegexStmtCreateTable.Regex.FindStringSubmatch(comment); len(matches) >= util.RegexStmtCreateTable.Index {
+			if matches := util.RegexStmtCreateTable.Regex.FindStringSubmatch(comment); len(matches) > util.RegexStmtCreateTable.Index {
 				stmt.SetCreateTable(matches[util.RegexStmtCreateTable.Index])
-			}
-			if matches := util.RegexStmtCreateTableConstraint.Regex.FindStringSubmatch(comment); len(matches) > util.RegexStmtCreateTableConstraint.Index {
+			} else if matches := util.RegexStmtCreateTableConstraint.Regex.FindStringSubmatch(comment); len(matches) > util.RegexStmtCreateTableConstraint.Index {
 				stmt.Constraints = append(stmt.Constraints, &ddlast.CreateTableConstraint{
 					Constraint: matches[util.RegexStmtCreateTableConstraint.Index],
 				})
-			}
-			if matches := util.RegexStmtCreateTableOptions.Regex.FindStringSubmatch(comment); len(matches) > util.RegexStmtCreateTableOptions.Index {
+			} else if matches := util.RegexStmtCreateTableOptions.Regex.FindStringSubmatch(comment); len(matches) > util.RegexStmtCreateTableOptions.Index {
 				stmt.Options = append(stmt.Options, &ddlast.CreateTableOption{
 					Option: matches[util.RegexStmtCreateTableOptions.Index],
 				})

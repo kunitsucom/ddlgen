@@ -9,15 +9,15 @@ import (
 	filepathz "github.com/kunitsucom/util.go/path/filepath"
 	slicez "github.com/kunitsucom/util.go/slices"
 
-	ddlast "github.com/kunitsucom/ddlgen/internal/ddlgen/ast"
+	ddlast "github.com/kunitsucom/ddlgen/internal/ddlgen/ddl"
 	"github.com/kunitsucom/ddlgen/internal/logs"
 	"github.com/kunitsucom/ddlgen/pkg/errors"
 )
 
 const (
 	Dialect       = "spanner"
-	commentPrefix = "--"
-	quotation     = "`"
+	CommentPrefix = "--"
+	Quotation     = "`"
 )
 
 func Fprint(w io.Writer, ddl *ddlast.DDL) error {
@@ -46,13 +46,13 @@ func Fprint(w io.Writer, ddl *ddlast.DDL) error {
 
 func fprintComment(w io.Writer, indent string, comment string) error {
 	if comment == "" {
-		if _, err := io.WriteString(w, indent+commentPrefix+"\n"); err != nil {
+		if _, err := io.WriteString(w, indent+CommentPrefix+"\n"); err != nil {
 			return errorz.Errorf("io.WriteString: %w", err)
 		}
 		return nil
 	}
 
-	if _, err := io.WriteString(w, indent+commentPrefix+" "+comment+"\n"); err != nil {
+	if _, err := io.WriteString(w, indent+CommentPrefix+" "+comment+"\n"); err != nil {
 		return errorz.Errorf("io.WriteString: %w", err)
 	}
 	return nil
@@ -141,7 +141,7 @@ func fprintCreateTableColumn(w io.Writer, indent string, columns []*ddlast.Creat
 			}
 		}
 
-		columnLine := indent + fmt.Sprintf(columnNameFormat, quotation+column.Column+quotation) + " " + column.TypeConstraint
+		columnLine := indent + fmt.Sprintf(columnNameFormat, Quotation+column.Column+Quotation) + " " + column.TypeConstraint
 		if _, err := io.WriteString(w, columnLine); err != nil {
 			return errorz.Errorf("io.WriteString: %w", err)
 		}

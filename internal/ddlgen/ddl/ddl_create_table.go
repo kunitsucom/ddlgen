@@ -1,4 +1,4 @@
-package ast
+package ddl
 
 import (
 	"regexp"
@@ -24,7 +24,7 @@ func (stmt *CreateTableStmt) GetSourceLine() int {
 	return stmt.SourceLine
 }
 
-func (*CreateTableStmt) stmt() {}
+func (*CreateTableStmt) private() {}
 
 var createTableRegex = regexp.MustCompile(`\s*CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?([^\s]+)`)
 

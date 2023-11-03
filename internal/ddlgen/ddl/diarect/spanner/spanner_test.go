@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/kunitsucom/ddlgen/internal/contexts"
-	ddlast "github.com/kunitsucom/ddlgen/internal/ddlgen/ast"
+	ddlast "github.com/kunitsucom/ddlgen/internal/ddlgen/ddl"
 )
 
 func TestFprint(t *testing.T) {

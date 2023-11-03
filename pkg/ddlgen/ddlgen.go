@@ -14,9 +14,9 @@ import (
 
 	"github.com/kunitsucom/ddlgen/internal/config"
 	"github.com/kunitsucom/ddlgen/internal/contexts"
-	ddlast "github.com/kunitsucom/ddlgen/internal/ddlgen/ast"
-	"github.com/kunitsucom/ddlgen/internal/ddlgen/diarect/spanner"
-	ddlgen_go "github.com/kunitsucom/ddlgen/internal/ddlgen/lang/go"
+	ddlast "github.com/kunitsucom/ddlgen/internal/ddlgen/ddl"
+	"github.com/kunitsucom/ddlgen/internal/ddlgen/ddl/diarect/spanner"
+	ddlgengo "github.com/kunitsucom/ddlgen/internal/ddlgen/lang/go"
 	"github.com/kunitsucom/ddlgen/internal/logs"
 	apperr "github.com/kunitsucom/ddlgen/pkg/errors"
 )
@@ -78,7 +78,7 @@ func DDLGen(ctx context.Context) error {
 func parse(ctx context.Context, src string) (*ddlast.DDL, error) {
 	switch language := config.Language(); language {
 	case "go":
-		ddl, err := ddlgen_go.Parse(ctx, src)
+		ddl, err := ddlgengo.Parse(ctx, src)
 		if err != nil {
 			return nil, errorz.Errorf("ddlgengo.Parse: %w", err)
 		}

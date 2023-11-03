@@ -10,6 +10,7 @@ import (
 
 	"github.com/kunitsucom/ddlgen/internal/config"
 	"github.com/kunitsucom/ddlgen/internal/contexts"
+	"github.com/kunitsucom/ddlgen/internal/logs"
 )
 
 func TestExtractDDLSource(t *testing.T) {
@@ -43,9 +44,17 @@ type (
 	// spanddl:options:PRIMARY KEY (` + "`id`" + `)
 	User struct {
 		// ID is a user ID.
-		ID string ` + "`db:\"Id\"   spanddl:\"STRING(36) NOT NULL\"`" + `
+		ID string   ` + "`db:\"Id\"   spanddl:\"STRING(36)  NOT NULL\"`" + `
 		// Name is a user name.
 		Name string ` + "`db:\"Name\" spanddl:\"STRING(255) NOT NULL\"`" + `
+	}
+
+	// Book is a book.
+	//
+	// spanddl:table:` + "`books`" + `
+	Book struct {
+		// ID is a book ID.
+		ID string   ` + "`db:\"Id\"   spanddl:\"STRING(36)  NOT NULL\"`" + `
 	}
 )
 `)
@@ -60,8 +69,10 @@ type (
 			t.Fatalf("❌: extractDDLSource: %+v", err)
 		}
 
+		logs.Trace = logs.NewTrace()
+		dumpDDLSource(fset, ddlSrc)
 		for _, s := range ddlSrc {
-			t.Logf("✅: ddlSrc: %+v", s)
+			t.Logf("✅: ddlSrc: %#v", s)
 		}
 	})
 }
