@@ -17,7 +17,7 @@ type (
 	SuccessParen struct {
 		// ID is a primary key of SuccessParen
 		// ID requires uuid
-		ID string `dbtest:"Id" spanddl:"STRING(36) NOT NULL"`
+		ID string          `dbtest:"Id"          spanddl:"STRING(36)   NOT NULL"`
 		// Description is a description of SuccessParen
 		Description string `dbtest:"Description" spanddl:"STRING(1024) NOT NULL"`
 	}
@@ -30,11 +30,11 @@ type (
 	SuccessParenTwo struct {
 		// ID is a primary key of SuccessParenTwo
 		// ID requires uuid
-		ID string `dbtest:"Id" spanddl:"STRING(36) NOT NULL"`
+		ID string             `dbtest:"Id"             spanddl:"STRING(36)   NOT NULL"`
 		// SuccessParenID is a foreign key to SuccessParen.ID
-		SuccessParenID string `dbtest:"SuccessParenId" spanddl:"STRING(36) NOT NULL"`
+		SuccessParenID string `dbtest:"SuccessParenId" spanddl:"STRING(36)   NOT NULL"`
 		// Description is a description of SuccessParenTwo
-		Description string `dbtest:"Description" spanddl:"STRING(1024) NOT NULL"`
+		Description string    `dbtest:"Description"    spanddl:"STRING(1024) NOT NULL"`
 	}
 
 	// SuccessParenThree
@@ -43,7 +43,7 @@ type (
 	SuccessParenThree struct {
 		// ID is a primary key of SuccessParenThree
 		// ID requires uuid
-		ID string `dbtest:"Id" spanddl:"STRING(36) NOT NULL"`
+		ID string          `dbtest:"Id"          spanddl:"STRING(36)   NOT NULL"`
 		// Description is a description of SuccessParenThree
 		Description string `dbtest:"Description" spanddl:"STRING(1024) NOT NULL"`
 	}
@@ -54,11 +54,11 @@ type (
 	SuccessParenFour struct {
 		// ID is a primary key of SuccessParenFour
 		// ID requires uuid
-		ID string `dbtest:"Id" spanddl:"STRING(36) NOT NULL"`
+		ID string             `dbtest:"Id"             spanddl:"STRING(36)   NOT NULL"`
 		// SuccessParenID is a foreign key to SuccessParen.ID
-		SuccessParenID string `dbtest:"SuccessParenId" spanddl:"STRING(36) NOT NULL"`
+		SuccessParenID string `dbtest:"SuccessParenId" spanddl:"STRING(36)   NOT NULL"`
 		// Description is a description of SuccessParenFour
-		Description string `dbtest:"Description" spanddl:"STRING(1024) NOT NULL"`
+		Description string    `dbtest:"Description"    spanddl:"STRING(1024) NOT NULL"`
 	}
 )
 EOF
@@ -75,7 +75,7 @@ spanddl: options: PRIMARY KEY (`Id`)
 type SuccessRoot struct {
 	// ID is a primary key of SuccessRoot
 	// ID requires uuid
-	ID string `dbtest:"Id" spanddl:"STRING(36) NOT NULL"`
+	ID string          `dbtest:"Id"          spanddl:"STRING(36)   NOT NULL"`
 	// Description is a description of SuccessRoot
 	Description string `dbtest:"Description" spanddl:"STRING(1024) NOT NULL"`
 }
@@ -83,16 +83,16 @@ type SuccessRoot struct {
 // SuccessRootTwo
 //
 // spanddl:      table: CREATE TABLE success_root_twos
-// spanddl: constraint: FOREIGN KEY (success_root_id) REFERENCES success_roots(`Id`)
+// spanddl: constraint: FOREIGN KEY (SuccessRootId) REFERENCES success_roots(`Id`)
 // spanddl:    options: PRIMARY KEY (`Id`)
 type SuccessRootTwo struct {
 	// ID is a primary key of SuccessRootTwo
 	// ID requires uuid
-	ID string `dbtest:"Id" spanddl:"STRING(36) NOT NULL"`
+	ID string            `dbtest:"Id"            spanddl:"STRING(36)   NOT NULL"`
 	// SuccessRootID is a foreign key to SuccessRoot.ID
-	SuccessRootID string `dbtest:"success_root_id" spanddl:"STRING(36) NOT NULL"`
+	SuccessRootID string `dbtest:"SuccessRootId" spanddl:"STRING(36)   NOT NULL"`
 	// Description is a description of SuccessRootTwo
-	Description string `dbtest:"Description" spanddl:"STRING(1024) NOT NULL"`
+	Description string   `dbtest:"Description"   spanddl:"STRING(1024) NOT NULL"`
 }
 EOF
 

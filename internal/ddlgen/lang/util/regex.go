@@ -9,16 +9,16 @@ type StmtRegex struct {
 
 //nolint:gochecknoglobals
 var (
-	RegexStmtCreateTable = StmtRegex{
-		Regex: regexp.MustCompile(`\s*table\s*:\s*((CREATE\s+TABLE\s+)?.*)`),
+	StmtRegexCreateTable = StmtRegex{
+		Regex: regexp.MustCompile(`\s*tables?\s*:\s*((CREATE\s+TABLE\s+)?.*)`),
 		Index: 1,
 	}
-	RegexStmtCreateTableConstraint = StmtRegex{
-		Regex: regexp.MustCompile(`\s*constraint\s*:\s*(.*)`),
+	StmtRegexCreateTableConstraint = StmtRegex{
+		Regex: regexp.MustCompile(`\s*constraints?\s*:\s*(.*)`),
 		Index: 1,
 	}
-	RegexStmtCreateTableOptions = StmtRegex{
-		Regex: regexp.MustCompile(`\s*options\s*:\s*(.*)`),
+	StmtRegexCreateTableOptions = StmtRegex{
+		Regex: regexp.MustCompile(`\s*options?\s*:\s*(.*)`),
 		Index: 1,
 	}
 )

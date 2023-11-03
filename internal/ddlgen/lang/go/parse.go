@@ -107,24 +107,25 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 		for _, comment := range comments {
 			logs.Debug.Printf("[COMMENT DETECTED]: %s:%d: %s", stmt.SourceFile, stmt.SourceLine, comment)
 		}
-		stmt.Comments = append(stmt.Comments, util.TrimTailEmptyCommentElement(util.TrimDDLGenCommentElement(comments))...)
+		// stmt.Comments = append(stmt.Comments, util.TrimTailEmptyCommentElement(util.TrimDDLGenCommentElement(comments))...)
+		stmt.Comments = append(stmt.Comments, comments...)
 
 		// CREATE TABLE / CONSTRAINT / OPTIONS
 		for _, comment := range comments {
-			if matches := util.RegexStmtCreateTable.Regex.FindStringSubmatch(comment); len(matches) > util.RegexStmtCreateTable.Index {
-				stmt.SetCreateTable(matches[util.RegexStmtCreateTable.Index])
-			} else if matches := util.RegexStmtCreateTableConstraint.Regex.FindStringSubmatch(comment); len(matches) > util.RegexStmtCreateTableConstraint.Index {
+			if matches := util.StmtRegexCreateTable.Regex.FindStringSubmatch(comment); len(matches) > util.StmtRegexCreateTable.Index {
+				stmt.SetCreateTable(matches[util.StmtRegexCreateTable.Index])
+			} else if matches := util.StmtRegexCreateTableConstraint.Regex.FindStringSubmatch(comment); len(matches) > util.StmtRegexCreateTableConstraint.Index {
 				stmt.Constraints = append(stmt.Constraints, &ddlast.CreateTableConstraint{
-					Constraint: matches[util.RegexStmtCreateTableConstraint.Index],
+					Constraint: matches[util.StmtRegexCreateTableConstraint.Index],
 				})
-			} else if matches := util.RegexStmtCreateTableOptions.Regex.FindStringSubmatch(comment); len(matches) > util.RegexStmtCreateTableOptions.Index {
+			} else if matches := util.StmtRegexCreateTableOptions.Regex.FindStringSubmatch(comment); len(matches) > util.StmtRegexCreateTableOptions.Index {
 				stmt.Options = append(stmt.Options, &ddlast.CreateTableOption{
-					Option: matches[util.RegexStmtCreateTableOptions.Index],
+					Option: matches[util.StmtRegexCreateTableOptions.Index],
 				})
 			}
 		}
 		if stmt.CreateTable == "" {
-			stmt.CreateTable = fmt.Sprintf("CREATE TABLE %s", r.TypeSpec.Name)
+			stmt.SetCreateTable(r.TypeSpec.Name.String())
 		}
 
 		// columns
