@@ -21,4 +21,8 @@ var (
 		Regex: regexp.MustCompile(`\s*options?\s*:\s*(.*)`),
 		Index: 1,
 	}
+	StmtRegexCreateIndex = StmtRegex{
+		Regex: regexp.MustCompile(`\s*index(es)?\s*:\s*(.*)`),
+		Index: 2,
+	}
 )

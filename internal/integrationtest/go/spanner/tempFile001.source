@@ -3,9 +3,10 @@ package main
 type (
 	// User is a user.
 	//
-	// spanddl:table:`Users`
-	// spanddl:option:PRIMARY KEY (`Id`)
-	// spanddl:constraint:CONSTRAINT AgeGTEZero CHECK(Age >= 0)
+	// spanddl:      table: `Users`
+	// spanddl:     option: PRIMARY KEY (`Id`)
+	// spanddl: constraint: CONSTRAINT AgeGTEZero CHECK(Age >= 0)
+	// spanddl:      index: CREATE INDEX `IndexUsersByName` ON Users(`Name`)
 	User struct {
 		// ID is a user ID.
 		ID string    `db:"Id"    spanddl:"STRING(36)  NOT NULL"`
