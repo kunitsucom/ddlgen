@@ -1,5 +1,5 @@
 //nolint:testpackage
-package integrationtest
+package spanner
 
 import (
 	"bytes"
@@ -14,7 +14,6 @@ import (
 
 	"github.com/kunitsucom/ddlgen/internal/config"
 	"github.com/kunitsucom/ddlgen/internal/contexts"
-	"github.com/kunitsucom/ddlgen/internal/ddlgen/ddl/diarect/spanner"
 	ddlgengo "github.com/kunitsucom/ddlgen/internal/ddlgen/lang/go"
 )
 
@@ -31,7 +30,7 @@ func Test_integrationtest_go_spanner(t *testing.T) {
 			"--dialect=spanner",
 			"--column-key-go=dbtest",
 			"--ddl-key-go=spanddl",
-			"--src=tempFile001.source",
+			"--src=integrationtest_go_spanner_001.source",
 			"--dst=dummy",
 		})
 
@@ -45,9 +44,9 @@ func Test_integrationtest_go_spanner(t *testing.T) {
 
 		buf := bytes.NewBuffer(nil)
 
-		require.NoError(t, spanner.Fprint(buf, ddl))
+		require.NoError(t, Fprint(buf, ddl))
 
-		golden, err := os.ReadFile("tempFile001.golden")
+		golden, err := os.ReadFile("integrationtest_go_spanner_001.golden")
 		require.NoError(t, err)
 
 		if !assert.Equal(t, string(golden), buf.String()) {

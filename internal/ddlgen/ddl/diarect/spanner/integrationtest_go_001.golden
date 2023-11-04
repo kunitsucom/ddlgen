@@ -3,7 +3,7 @@
 -- Date: 2021-01-01T09:00:00+09:00
 --
 
--- source: spanner/tempFile001.source:4
+-- source: spanner/integrationtest_go_spanner_001.source:4
 -- User is a user.
 --
 -- spanddl:      table: `Users`
@@ -21,11 +21,11 @@ CREATE TABLE `Users` (
     CONSTRAINT AgeGTEZero CHECK(Age >= 0)
 ) PRIMARY KEY (`Id`);
 
--- source: spanner/tempFile001.source:9
+-- source: spanner/integrationtest_go_spanner_001.source:9
 -- spanddl:      index: CREATE INDEX `IndexUsersByName` ON Users(`Name`)
 CREATE INDEX `IndexUsersByName` ON Users(`Name`);
 
--- source: spanner/tempFile001.source:21
+-- source: spanner/integrationtest_go_spanner_001.source:21
 -- Book is a book.
 --
 -- spanddl:table:`Books`
@@ -42,7 +42,7 @@ CREATE TABLE `Books` (
     `Author` STRING(255) NOT NULL
 ) PRIMARY KEY (`Id`);
 
--- source: spanner/tempFile001.source:34
+-- source: spanner/integrationtest_go_spanner_001.source:34
 -- Author is a author.
 -- spanddl:
 -- NOTE: the comment does not have a key for table (spanddl: table: CREATE TABLE <table>), so the struct name "Author" is used as the table name.
@@ -53,7 +53,7 @@ CREATE TABLE Author (
     `Name` STRING(255) NOT NULL
 );
 
--- source: spanner/tempFile001.source:43
+-- source: spanner/integrationtest_go_spanner_001.source:43
 -- Store
 -- spanddl: table: CREATE TABLE `Stores`
 CREATE TABLE `Stores` (
@@ -65,9 +65,9 @@ CREATE TABLE `Stores` (
     `Name` ERROR
 );
 
--- source: spanner/tempFile001.source:53
+-- source: spanner/integrationtest_go_spanner_001.source:53
 -- spanddl: index: CREATE INDEX `IndexBooksByTitle` ON Books(`Title`)
 CREATE INDEX `IndexBooksByTitle` ON Books(`Title`);
 
--- source: spanner/tempFile001.source:53
+-- source: spanner/integrationtest_go_spanner_001.source:53
 -- ERROR: the comment does not have a key for table (spanddl: table: CREATE TABLE <table>), or the comment is not associated with struct.
