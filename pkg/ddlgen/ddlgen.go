@@ -30,6 +30,14 @@ func DDLGen(ctx context.Context) error {
 		return fmt.Errorf("config.Load: %w", err)
 	}
 
+	if config.Version() {
+		fmt.Printf("version: %s\n", config.BuildVersion())           //nolint:forbidigo
+		fmt.Printf("revision: %s\n", config.BuildRevision())         //nolint:forbidigo
+		fmt.Printf("build branch: %s\n", config.BuildBranch())       //nolint:forbidigo
+		fmt.Printf("build timestamp: %s\n", config.BuildTimestamp()) //nolint:forbidigo
+		return nil
+	}
+
 	ctx = contexts.WithNowString(ctx, time.RFC3339, config.Timestamp())
 
 	src := config.Source()

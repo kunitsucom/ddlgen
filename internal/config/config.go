@@ -17,6 +17,7 @@ import (
 //
 //nolint:tagliatelle
 type config struct {
+	Version     bool   `json:"version"`
 	Trace       bool   `json:"trace"`
 	Debug       bool   `json:"debug"`
 	Timestamp   string `json:"timestamp"`
@@ -66,6 +67,8 @@ func Load(ctx context.Context) (rollback func(), err error) {
 }
 
 const (
+	_OptionVersion = "version"
+
 	_OptionTrace = "trace"
 	_EnvKeyTrace = "DDLGEN_TRACE"
 
@@ -105,6 +108,11 @@ func load(ctx context.Context) (cfg *config, err error) { //nolint:unparam
 		Description: "Generate DDL from annotated source code.",
 		Options: []cliz.Option{
 			&cliz.BoolOption{
+				Name:        _OptionVersion,
+				Description: "show version information and exit",
+				Default:     cliz.Default(false),
+			},
+			&cliz.BoolOption{
 				Name:        _OptionTrace,
 				Environment: _EnvKeyTrace,
 				Description: "trace mode enabled",
@@ -132,6 +140,7 @@ func load(ctx context.Context) (cfg *config, err error) { //nolint:unparam
 				Name:        _OptionDialect,
 				Environment: _EnvKeyDialect,
 				Description: "SQL dialect to generate DDL",
+				Default:     cliz.Default(""),
 			},
 			&cliz.StringOption{
 				Name:        _OptionSource,
@@ -166,6 +175,7 @@ func load(ctx context.Context) (cfg *config, err error) { //nolint:unparam
 	}
 
 	c := &config{
+		Version:     loadVersion(ctx, cmd),
 		Trace:       loadTrace(ctx, cmd),
 		Debug:       loadDebug(ctx, cmd),
 		Timestamp:   loadTimestamp(ctx, cmd),
