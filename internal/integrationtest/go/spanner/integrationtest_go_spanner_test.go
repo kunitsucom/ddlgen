@@ -18,7 +18,7 @@ import (
 	ddlgengo "github.com/kunitsucom/ddlgen/internal/ddlgen/lang/go"
 )
 
-func TestExtractDDLSource(t *testing.T) {
+func Test_integrationtest_go_spanner(t *testing.T) {
 	t.Parallel()
 
 	t.Run("success", func(t *testing.T) {
