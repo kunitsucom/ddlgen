@@ -32,10 +32,10 @@ var (
 )
 
 const (
-	//	                                 _______________________ <- 1. comment prefix
-	//	                                                          __ <- 2. tag name
-	//	                                                                  __ <- 3. tag value
-	//	                                                                          ___ <- 4. comment suffix
+	//	                                       _______________________ <- 1. comment prefix
+	//	                                                                __ <- 2. tag name
+	//	                                                                        __ <- 3. tag value
+	//	                                                                                ___ <- 4. comment suffix
 	_DDLKeyGoCommentLineRegexFormat       = `^(\s*//+\s*|\s*/\*\s*|\s*)(%s):\s*(.*)?\s*(\*/)?`
 	_DDLKeyGoCommentLineRegexContentIndex = /*                                  ^^ */ 3
 )
@@ -47,8 +47,9 @@ func ddlKeyGoCommentLineRegex() *regexp.Regexp {
 	return _DDLKeyGoCommentLineRegex
 }
 
+//
 //nolint:cyclop
-func extractDDLSource(_ context.Context, fset *token.FileSet, f *goast.File) ([]*ddlSource, error) {
+func extractDDLSourceFromDDLKeyGo(_ context.Context, fset *token.FileSet, f *goast.File) ([]*ddlSource, error) {
 	ddlSrc := make([]*ddlSource, 0)
 
 	for commentedNode, commentGroups := range goast.NewCommentMap(fset, f, f.Comments) {

@@ -64,7 +64,7 @@ type (
 			t.Fatalf("❌: parser.ParseFile: %+v", err)
 		}
 
-		ddlSrc, err := extractDDLSource(ctx, fset, f)
+		ddlSrc, err := extractDDLSourceFromDDLKeyGo(ctx, fset, f)
 		if err != nil {
 			t.Fatalf("❌: extractDDLSource: %+v", err)
 		}

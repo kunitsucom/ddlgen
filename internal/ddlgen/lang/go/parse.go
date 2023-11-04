@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"go/ast"
 	"go/parser"
 	"go/token"
 	"os"
@@ -86,7 +87,7 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 		return nil, errorz.Errorf("parser.ParseFile: %w", err)
 	}
 
-	ddlSrc, err := extractDDLSource(ctx, fset, f)
+	ddlSrc, err := extractDDLSourceFromDDLKeyGo(ctx, fset, f)
 	if err != nil {
 		return nil, errorz.Errorf("extractDDLSource: %w", err)
 	}
@@ -95,73 +96,97 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 
 	stmts := make([]ddlast.Stmt, 0)
 	for _, r := range ddlSrc {
-		stmt := &ddlast.CreateTableStmt{}
+		createTableStmt := &ddlast.CreateTableStmt{}
 
 		// source
-		source := fset.Position(r.StructType.Pos())
-		stmt.SourceFile = source.Filename
-		stmt.SourceLine = source.Line
+		source := fset.Position(r.CommentGroup.Pos())
+		createTableStmt.SourceFile = source.Filename
+		createTableStmt.SourceLine = source.Line
 
-		// comments
+		// CREATE TABLE (or INDEX) / CONSTRAINT / OPTIONS (from comments)
 		comments := strings.Split(strings.Trim(r.CommentGroup.Text(), "\n"), "\n")
 		for _, comment := range comments {
-			logs.Debug.Printf("[COMMENT DETECTED]: %s:%d: %s", stmt.SourceFile, stmt.SourceLine, comment)
-		}
-		// stmt.Comments = append(stmt.Comments, util.TrimTailEmptyCommentElement(util.TrimDDLGenCommentElement(comments))...)
-		stmt.Comments = append(stmt.Comments, comments...)
+			logs.Debug.Printf("[COMMENT DETECTED]: %s:%d: %s", createTableStmt.SourceFile, createTableStmt.SourceLine, comment)
 
-		// CREATE TABLE / CONSTRAINT / OPTIONS
-		for _, comment := range comments {
-			if matches := util.StmtRegexCreateTable.Regex.FindStringSubmatch(comment); len(matches) > util.StmtRegexCreateTable.Index {
-				stmt.SetCreateTable(matches[util.StmtRegexCreateTable.Index])
-			} else if matches := util.StmtRegexCreateTableConstraint.Regex.FindStringSubmatch(comment); len(matches) > util.StmtRegexCreateTableConstraint.Index {
-				stmt.Constraints = append(stmt.Constraints, &ddlast.CreateTableConstraint{
+			// NOTE: CREATE INDEX may be written in CREATE TABLE annotation, so process it here
+			if /* CREATE INDEX */ matches := util.StmtRegexCreateIndex.Regex.FindStringSubmatch(comment); len(matches) > util.StmtRegexCreateIndex.Index {
+				commentMatchedCreateIndex := comment
+				source := fset.Position(extractContainingCommentFromCommentGroup(r.CommentGroup, commentMatchedCreateIndex).Pos())
+				createIndexStmt := &ddlast.CreateIndexStmt{
+					Comments:   []string{commentMatchedCreateIndex},
+					SourceFile: source.Filename,
+					SourceLine: source.Line,
+				}
+				createIndexStmt.SetCreateIndex(matches[util.StmtRegexCreateIndex.Index])
+				stmts = append(stmts, createIndexStmt)
+				continue
+			}
+
+			if /* CREATE TABLE */ matches := util.StmtRegexCreateTable.Regex.FindStringSubmatch(comment); len(matches) > util.StmtRegexCreateTable.Index {
+				createTableStmt.SetCreateTable(matches[util.StmtRegexCreateTable.Index])
+			} else if /* CONSTRAINT */ matches := util.StmtRegexCreateTableConstraint.Regex.FindStringSubmatch(comment); len(matches) > util.StmtRegexCreateTableConstraint.Index {
+				createTableStmt.Constraints = append(createTableStmt.Constraints, &ddlast.CreateTableConstraint{
 					Constraint: matches[util.StmtRegexCreateTableConstraint.Index],
 				})
-			} else if matches := util.StmtRegexCreateTableOptions.Regex.FindStringSubmatch(comment); len(matches) > util.StmtRegexCreateTableOptions.Index {
-				stmt.Options = append(stmt.Options, &ddlast.CreateTableOption{
+			} else if /* OPTIONS */ matches := util.StmtRegexCreateTableOptions.Regex.FindStringSubmatch(comment); len(matches) > util.StmtRegexCreateTableOptions.Index {
+				createTableStmt.Options = append(createTableStmt.Options, &ddlast.CreateTableOption{
 					Option: matches[util.StmtRegexCreateTableOptions.Index],
 				})
 			}
+			// comment
+			createTableStmt.Comments = append(createTableStmt.Comments, comment)
 		}
-		if stmt.CreateTable == "" {
-			stmt.SetCreateTable(r.TypeSpec.Name.String())
+
+		// CREATE TABLE (default: struct name)
+		if createTableStmt.CreateTable == "" && r.TypeSpec != nil {
+			name := r.TypeSpec.Name.String()
+			createTableStmt.Comments = append(createTableStmt.Comments, fmt.Sprintf("NOTE: the comment does not have a key for table (%s: table: CREATE TABLE <table>), so the struct name \"%s\" is used as the table name.", config.DDLKeyGo(), name))
+			createTableStmt.SetCreateTable(name)
+		}
+
+		// CREATE TABLE (error)
+		if createTableStmt.CreateTable == "" {
+			createTableStmt.Comments = append(createTableStmt.Comments, fmt.Sprintf("ERROR: the comment does not have a key for table (%s: table: CREATE TABLE <table>), or the comment is not associated with struct.", config.DDLKeyGo()))
 		}
 
 		// columns
-		for _, field := range r.StructType.Fields.List {
-			column := &ddlast.CreateTableColumn{}
+		if r.StructType != nil {
+			for _, field := range r.StructType.Fields.List {
+				column := &ddlast.CreateTableColumn{}
 
-			tag := reflect.StructTag(strings.Trim(field.Tag.Value, "`"))
+				tag := reflect.StructTag(strings.Trim(field.Tag.Value, "`"))
 
-			// column name
-			switch columnName := tag.Get(config.ColumnKeyGo()); columnName {
-			case "-":
-				logs.Info.Printf("[%s]: Ignore columns with column name \"-\": %s", stmt.CreateTable, field.Names[0].Name)
-				continue
-			case "":
-				column.Column = field.Names[0].Name
-			default:
-				column.Column = columnName
+				// column name
+				switch columnName := tag.Get(config.ColumnKeyGo()); columnName {
+				case "-":
+					logs.Info.Printf("[%s]: Ignore columns with column name \"-\": %s", createTableStmt.CreateTable, field.Names[0].Name)
+					continue
+				case "":
+					name := field.Names[0].Name
+					column.Comments = append(column.Comments, fmt.Sprintf("NOTE: the struct does not have a tag for column name (`%s:\"<ColumnName>\"`), so the field name \"%s\" is used as the column name.", config.ColumnKeyGo(), name))
+					column.Column = name
+				default:
+					column.Column = columnName
+				}
+
+				// column type and constraint
+				switch columnTypeConstraint := tag.Get(config.DDLKeyGo()); columnTypeConstraint {
+				case "":
+					column.Comments = append(column.Comments, fmt.Sprintf("ERROR: the struct does not have a tag for column type and constraint (`%s:\"<TYPE> [CONSTRAINT]\"`)", config.DDLKeyGo()))
+					column.TypeConstraint = "ERROR"
+				default:
+					column.TypeConstraint = columnTypeConstraint
+				}
+
+				// comments
+				comments := strings.Split(strings.Trim(field.Doc.Text(), "\n"), "\n")
+				column.Comments = append(column.Comments, util.TrimTailEmptyCommentElement(util.TrimDDLGenCommentElement(comments))...)
+
+				createTableStmt.Columns = append(createTableStmt.Columns, column)
 			}
-
-			// column type and constraint
-			switch columnTypeConstraint := tag.Get(config.DDLKeyGo()); columnTypeConstraint {
-			case "":
-				logs.Warn.Printf("[%s]: Ignore columns with no type and constraints set: %s", stmt.CreateTable, field.Names[0].Name)
-				continue
-			default:
-				column.TypeConstraint = columnTypeConstraint
-			}
-
-			// comments
-			comments := strings.Split(strings.Trim(field.Doc.Text(), "\n"), "\n")
-			column.Comments = append(column.Comments, util.TrimTailEmptyCommentElement(util.TrimDDLGenCommentElement(comments))...)
-
-			stmt.Columns = append(stmt.Columns, column)
 		}
 
-		stmts = append(stmts, stmt)
+		stmts = append(stmts, createTableStmt)
 	}
 
 	sort.Slice(stmts, func(i, j int) bool {
@@ -173,4 +198,13 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 	}
 
 	return stmts, nil
+}
+
+func extractContainingCommentFromCommentGroup(commentGroup *ast.CommentGroup, sub string) *ast.Comment {
+	for _, commentLine := range commentGroup.List {
+		if strings.Contains(commentLine.Text, sub) {
+			return commentLine
+		}
+	}
+	return nil
 }

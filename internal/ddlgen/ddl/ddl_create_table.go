@@ -2,6 +2,8 @@ package ddl
 
 import (
 	"regexp"
+
+	"github.com/kunitsucom/ddlgen/internal/ddlgen/lang/util"
 )
 
 var _ Stmt = (*CreateTableStmt)(nil)
@@ -26,10 +28,14 @@ func (stmt *CreateTableStmt) GetSourceLine() int {
 
 func (*CreateTableStmt) private() {}
 
-var createTableRegex = regexp.MustCompile(`\s*CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?([^\s]+)`)
+//nolint:gochecknoglobals
+var stmtRegexCreateTable = &util.StmtRegex{
+	Regex: regexp.MustCompile(`\s*CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?(\S+)`),
+	Index: 2,
+}
 
 func (stmt *CreateTableStmt) SetCreateTable(createTable string) {
-	if len(createTableRegex.FindStringSubmatch(createTable)) > 2 {
+	if len(stmtRegexCreateTable.Regex.FindStringSubmatch(createTable)) > stmtRegexCreateTable.Index {
 		stmt.CreateTable = createTable
 		return
 	}

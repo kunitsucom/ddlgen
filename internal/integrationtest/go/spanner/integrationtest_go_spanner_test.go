@@ -4,6 +4,7 @@ package integrationtest
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -49,6 +50,8 @@ func TestExtractDDLSource(t *testing.T) {
 		golden, err := os.ReadFile("tempFile001.golden")
 		require.NoError(t, err)
 
-		assert.Equal(t, string(golden), buf.String())
+		if !assert.Equal(t, string(golden), buf.String()) {
+			fmt.Println(buf.String()) //nolint:forbidigo
+		}
 	})
 }
