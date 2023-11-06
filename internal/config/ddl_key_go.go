@@ -7,7 +7,7 @@ import (
 )
 
 func loadDDLKeyGo(_ context.Context, cmd *cliz.Command) string {
-	v, _ := cmd.GetStringOption(_OptionDDLKeyGo)
+	v, _ := cmd.GetOptionString(_OptionDDLKeyGo)
 	return v
 }
 

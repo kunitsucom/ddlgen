@@ -78,8 +78,6 @@ func extractDDLSourceFromDDLKeyGo(_ context.Context, fset *token.FileSet, f *goa
 					})
 					ddlSrc = append(ddlSrc, r)
 					break CommentGroupLoop // NOTE: There may be multiple "DDLKeyGo"s in the same commentGroup, so once you find the first one, break.
-				} else if len(matches) > 0 {
-					logs.Warn.Printf("commentLine=%s: %v", commentLine, apperr.ErrUnknownError)
 				}
 			}
 		}

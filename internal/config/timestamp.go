@@ -7,7 +7,7 @@ import (
 )
 
 func loadTimestamp(_ context.Context, cmd *cliz.Command) string {
-	v, _ := cmd.GetStringOption(_OptionTimestamp)
+	v, _ := cmd.GetOptionString(_OptionTimestamp)
 	return v
 }
 

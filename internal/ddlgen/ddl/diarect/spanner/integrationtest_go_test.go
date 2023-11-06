@@ -30,7 +30,7 @@ func Test_integrationtest_go_spanner(t *testing.T) {
 			"--dialect=spanner",
 			"--column-key-go=dbtest",
 			"--ddl-key-go=spanddl",
-			"--src=integrationtest_go_spanner_001.source",
+			"--src=integrationtest_go_001.source",
 			"--dst=dummy",
 		})
 
@@ -46,7 +46,7 @@ func Test_integrationtest_go_spanner(t *testing.T) {
 
 		require.NoError(t, Fprint(buf, ddl))
 
-		golden, err := os.ReadFile("integrationtest_go_spanner_001.golden")
+		golden, err := os.ReadFile("integrationtest_go_001.golden")
 		require.NoError(t, err)
 
 		if !assert.Equal(t, string(golden), buf.String()) {

@@ -7,7 +7,7 @@ import (
 )
 
 func loadLanguage(_ context.Context, cmd *cliz.Command) string {
-	v, _ := cmd.GetStringOption(_OptionLanguage)
+	v, _ := cmd.GetOptionString(_OptionLanguage)
 	return v
 }
 

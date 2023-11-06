@@ -7,7 +7,7 @@ import (
 )
 
 func loadColumnKeyGo(_ context.Context, cmd *cliz.Command) string {
-	v, _ := cmd.GetStringOption(_OptionColumnKeyGo)
+	v, _ := cmd.GetOptionString(_OptionColumnKeyGo)
 	return v
 }
 

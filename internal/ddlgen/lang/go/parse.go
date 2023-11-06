@@ -17,18 +17,16 @@ import (
 
 	"github.com/kunitsucom/ddlgen/internal/config"
 	ddlast "github.com/kunitsucom/ddlgen/internal/ddlgen/ddl"
-	"github.com/kunitsucom/ddlgen/internal/ddlgen/lang/util"
+	langutil "github.com/kunitsucom/ddlgen/internal/ddlgen/lang/util"
 	"github.com/kunitsucom/ddlgen/internal/logs"
+	"github.com/kunitsucom/ddlgen/internal/util"
 	apperr "github.com/kunitsucom/ddlgen/pkg/errors"
 )
 
 //nolint:cyclop
 func Parse(ctx context.Context, src string) (*ddlast.DDL, error) {
 	// MEMO: get absolute path for parser.ParseFile()
-	sourceAbs, err := filepath.Abs(src)
-	if err != nil {
-		return nil, errorz.Errorf("filepath.Abs: %w", err)
-	}
+	sourceAbs := util.Abs(src)
 
 	info, err := os.Stat(sourceAbs)
 	if err != nil {
@@ -38,32 +36,7 @@ func Parse(ctx context.Context, src string) (*ddlast.DDL, error) {
 	ddl := ddlast.NewDDL(ctx)
 
 	if info.IsDir() {
-		if err := filepath.WalkDir(sourceAbs, func(path string, d os.DirEntry, err error) error {
-			if err != nil {
-				return err //nolint:wrapcheck
-			}
-
-			if d.IsDir() {
-				return nil
-			}
-
-			if !strings.HasSuffix(path, ".go") {
-				return nil
-			}
-
-			stmts, err := parseFile(ctx, path)
-			if err != nil {
-				if errors.Is(err, apperr.ErrDDLKeyGoNotFoundInSource) {
-					logs.Debug.Printf("parseFile: %s: %v", path, err)
-					return nil
-				}
-				return errorz.Errorf("parseFile: %w", err)
-			}
-
-			ddl.Stmts = append(ddl.Stmts, stmts...)
-
-			return nil
-		}); err != nil {
+		if err := filepath.WalkDir(sourceAbs, walkDirFn(ctx, ddl)); err != nil {
 			return nil, errorz.Errorf("filepath.WalkDir: %w", err)
 		}
 
@@ -77,6 +50,31 @@ func Parse(ctx context.Context, src string) (*ddlast.DDL, error) {
 	ddl.Stmts = append(ddl.Stmts, stmts...)
 
 	return ddl, nil
+}
+
+func walkDirFn(ctx context.Context, ddl *ddlast.DDL) func(path string, d os.DirEntry, err error) error {
+	return func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err //nolint:wrapcheck
+		}
+
+		if d.IsDir() || !strings.HasSuffix(path, ".go") {
+			return nil
+		}
+
+		stmts, err := parseFile(ctx, path)
+		if err != nil {
+			if errors.Is(err, apperr.ErrDDLKeyGoNotFoundInSource) {
+				logs.Debug.Printf("parseFile: %s: %v", path, err)
+				return nil
+			}
+			return errorz.Errorf("parseFile: %w", err)
+		}
+
+		ddl.Stmts = append(ddl.Stmts, stmts...)
+
+		return nil
+	}
 }
 
 //nolint:cyclop,funlen,gocognit
@@ -109,7 +107,7 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 			logs.Debug.Printf("[COMMENT DETECTED]: %s:%d: %s", createTableStmt.SourceFile, createTableStmt.SourceLine, comment)
 
 			// NOTE: CREATE INDEX may be written in CREATE TABLE annotation, so process it here
-			if /* CREATE INDEX */ matches := util.StmtRegexCreateIndex.Regex.FindStringSubmatch(comment); len(matches) > util.StmtRegexCreateIndex.Index {
+			if /* CREATE INDEX */ matches := langutil.StmtRegexCreateIndex.Regex.FindStringSubmatch(comment); len(matches) > langutil.StmtRegexCreateIndex.Index {
 				commentMatchedCreateIndex := comment
 				source := fset.Position(extractContainingCommentFromCommentGroup(r.CommentGroup, commentMatchedCreateIndex).Pos())
 				createIndexStmt := &ddlast.CreateIndexStmt{
@@ -117,20 +115,20 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 					SourceFile: source.Filename,
 					SourceLine: source.Line,
 				}
-				createIndexStmt.SetCreateIndex(matches[util.StmtRegexCreateIndex.Index])
+				createIndexStmt.SetCreateIndex(matches[langutil.StmtRegexCreateIndex.Index])
 				stmts = append(stmts, createIndexStmt)
 				continue
 			}
 
-			if /* CREATE TABLE */ matches := util.StmtRegexCreateTable.Regex.FindStringSubmatch(comment); len(matches) > util.StmtRegexCreateTable.Index {
-				createTableStmt.SetCreateTable(matches[util.StmtRegexCreateTable.Index])
-			} else if /* CONSTRAINT */ matches := util.StmtRegexCreateTableConstraint.Regex.FindStringSubmatch(comment); len(matches) > util.StmtRegexCreateTableConstraint.Index {
+			if /* CREATE TABLE */ matches := langutil.StmtRegexCreateTable.Regex.FindStringSubmatch(comment); len(matches) > langutil.StmtRegexCreateTable.Index {
+				createTableStmt.SetCreateTable(matches[langutil.StmtRegexCreateTable.Index])
+			} else if /* CONSTRAINT */ matches := langutil.StmtRegexCreateTableConstraint.Regex.FindStringSubmatch(comment); len(matches) > langutil.StmtRegexCreateTableConstraint.Index {
 				createTableStmt.Constraints = append(createTableStmt.Constraints, &ddlast.CreateTableConstraint{
-					Constraint: matches[util.StmtRegexCreateTableConstraint.Index],
+					Constraint: matches[langutil.StmtRegexCreateTableConstraint.Index],
 				})
-			} else if /* OPTIONS */ matches := util.StmtRegexCreateTableOptions.Regex.FindStringSubmatch(comment); len(matches) > util.StmtRegexCreateTableOptions.Index {
+			} else if /* OPTIONS */ matches := langutil.StmtRegexCreateTableOptions.Regex.FindStringSubmatch(comment); len(matches) > langutil.StmtRegexCreateTableOptions.Index {
 				createTableStmt.Options = append(createTableStmt.Options, &ddlast.CreateTableOption{
-					Option: matches[util.StmtRegexCreateTableOptions.Index],
+					Option: matches[langutil.StmtRegexCreateTableOptions.Index],
 				})
 			}
 			// comment
@@ -159,7 +157,7 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 				// column name
 				switch columnName := tag.Get(config.ColumnKeyGo()); columnName {
 				case "-":
-					logs.Info.Printf("[%s]: Ignore columns with column name \"-\": %s", createTableStmt.CreateTable, field.Names[0].Name)
+					createTableStmt.Comments = append(createTableStmt.Comments, fmt.Sprintf("NOTE: the struct has a tag for column name (`%s:\"-\"`), so the field is ignored.", config.ColumnKeyGo()))
 					continue
 				case "":
 					name := field.Names[0].Name
@@ -180,7 +178,7 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 
 				// comments
 				comments := strings.Split(strings.Trim(field.Doc.Text(), "\n"), "\n")
-				column.Comments = append(column.Comments, util.TrimTailEmptyCommentElement(util.TrimDDLGenCommentElement(comments))...)
+				column.Comments = append(column.Comments, langutil.TrimCommentElementTailEmpty(langutil.TrimCommentElementHasPrefix(comments, config.DDLKeyGo()))...)
 
 				createTableStmt.Columns = append(createTableStmt.Columns, column)
 			}

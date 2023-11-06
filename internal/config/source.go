@@ -7,7 +7,7 @@ import (
 )
 
 func loadSource(_ context.Context, cmd *cliz.Command) string {
-	v, _ := cmd.GetStringOption(_OptionSource)
+	v, _ := cmd.GetOptionString(_OptionSource)
 	return v
 }
 

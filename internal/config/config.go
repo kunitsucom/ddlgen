@@ -170,7 +170,7 @@ func load(ctx context.Context) (cfg *config, err error) { //nolint:unparam
 		},
 	}
 
-	if _, _, err := cmd.Parse(contexts.Args(ctx)); err != nil {
+	if _, err := cmd.Parse(contexts.Args(ctx)); err != nil {
 		return nil, errorz.Errorf("cmd.Parse: %w", err)
 	}
 

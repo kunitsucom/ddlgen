@@ -7,7 +7,7 @@ import (
 )
 
 func loadDestination(_ context.Context, cmd *cliz.Command) string {
-	v, _ := cmd.GetStringOption(_OptionDestination)
+	v, _ := cmd.GetOptionString(_OptionDestination)
 	return v
 }
 

@@ -4,17 +4,15 @@ import (
 	"strings"
 
 	slicez "github.com/kunitsucom/util.go/slices"
-
-	"github.com/kunitsucom/ddlgen/internal/config"
 )
 
-func TrimDDLGenCommentElement(stringSlice []string) []string {
+func TrimCommentElementHasPrefix(stringSlice []string, prefix string) []string {
 	return slicez.Filter(stringSlice, func(_ int, s string) bool {
-		return !strings.HasPrefix(s, config.DDLKeyGo())
+		return !strings.HasPrefix(s, prefix)
 	})
 }
 
-func TrimTailEmptyCommentElement(stringSlice []string) []string {
+func TrimCommentElementTailEmpty(stringSlice []string) []string {
 	if len(stringSlice) == 0 {
 		return stringSlice
 	}
