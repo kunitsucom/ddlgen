@@ -2,6 +2,8 @@ package ddl
 
 import (
 	"regexp"
+
+	"github.com/kunitsucom/ddlgen/internal/ddlgen/lang/util"
 )
 
 var _ Stmt = (*CreateIndexStmt)(nil)
@@ -23,10 +25,14 @@ func (stmt *CreateIndexStmt) GetSourceLine() int {
 
 func (*CreateIndexStmt) private() {}
 
-var createIndexRegex = regexp.MustCompile(`\s*CREATE\s+INDEX\s+(IF\s+NOT\s+EXISTS\s+)?([^\s]+)`)
+//nolint:gochecknoglobals
+var stmtRegexCreateIndex = &util.StmtRegex{
+	Regex: regexp.MustCompile(`(?i)\s*CREATE\s+(.*)?INDEX\s+(.*)?(\S+)`),
+	Index: 3,
+}
 
 func (stmt *CreateIndexStmt) SetCreateIndex(createIndex string) {
-	if len(createIndexRegex.FindStringSubmatch(createIndex)) > 2 {
+	if len(stmtRegexCreateIndex.Regex.FindStringSubmatch(createIndex)) > stmtRegexCreateIndex.Index {
 		stmt.CreateIndex = createIndex
 		return
 	}
