@@ -6,9 +6,13 @@ on:
       - opened
       - edited
       - labeled
+      - unlabeled
       - ready_for_review
       - reopened
       - synchronize
+
+env:
+  LABELS: "BREAKING CHANGE,build,ci,docs,feat,fix,perf,refactor,test,chore"
 
 jobs:
   check:
@@ -18,10 +22,39 @@ jobs:
     permissions:
       id-token: write
       contents: read
-      pull-requests: read
-      statuses: write
+      pull-requests: write # required to add labels
+      statuses: read
+      checks: read
+      repository-projects: read
     steps:
-      - uses: docker://agilepathway/pull-request-label-checker:latest # ref: https://github.com/agilepathway/label-checker/tree/master
+      - uses: actions/checkout@v4
         with:
-          any_of: "BREAKING CHANGE,build,ci,docs,feat,fix,perf,refactor,test,chore"
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.event.pull_request.head.ref }} # needed for gh pr view
+      - name: Check labels
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          # Check labels
+          set -Eeuo pipefail -x
+
+          # If any of the labels are present, exit with success
+          if [[ -n "$(gh pr view --json labels --jq ".labels[].name" | grep -E "^($(tr , "|" <<<"${LABELS:?}"))$")" ]]; then
+            exit 0
+          fi
+
+          # Add labels based on PR title
+          GH_PR_TITLE=$(gh pr view --json title --jq .title)
+          gh label list --json name --jq ".[].name" | while read -r LINE; do
+            awk -F: "/^${LINE-}(\([^\)]+\))?:/ {print \$1}" <<<"${GH_PR_TITLE:?}" | grep -Eo "^${LINE:?}" || true # NOTE: Ignore the return value of grep because we just want to output the string
+          done | xargs -t -I{} gh pr edit --add-label {}
+
+          # If any of the labels are present, exit with success
+          while read -r LINE; do
+            if grep -E "^($(tr , "|" <<<"${LABELS:?}"))$" <<<"${LINE-}"; then
+              exit 0
+            fi
+          done <<<"$(gh pr view --json labels --jq ".labels[].name")"
+
+          # If none of the labels are present, exit with error
+          exit 1
