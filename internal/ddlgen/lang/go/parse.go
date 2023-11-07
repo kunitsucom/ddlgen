@@ -58,7 +58,7 @@ func walkDirFn(ctx context.Context, ddl *ddlast.DDL) func(path string, d os.DirE
 			return err //nolint:wrapcheck
 		}
 
-		if d.IsDir() || !strings.HasSuffix(path, ".go") {
+		if d.IsDir() || !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
 			return nil
 		}
 

@@ -148,7 +148,7 @@ func TestParse(t *testing.T) {
 			"--dialect=spanner",
 			"--column-key-go=dbtest",
 			"--ddl-key-go=spanddl",
-			"--src=tests/no-ddl-key-go_test.go",
+			"--src=tests/no-ddl-key-go.go",
 			"--dst=dummy",
 		})
 
