@@ -102,7 +102,7 @@ go install github.com/kunitsucom/ddlgen/cmd/ddlgen@latest
 ### pre-built binary
 
 ```bash
-VERSION=v0.0.2
+VERSION=v0.0.3
 
 # download
 curl -fLROSs https://github.com/kunitsucom/ddlgen/releases/download/${VERSION}/ddlgen_${VERSION}_darwin_arm64.zip
