@@ -45,7 +45,7 @@ type Group struct {
 EOF
 
 $ # == 2. generate DDL ================================
-$ ddlgen --dialect spanner --column-key-go db --ddl-key-go spanddl --src /tmp/sample.go --dst /tmp/sample.sql
+$ ddlgen --dialect spanner --column-tag-go db --ddl-tag-go spanddl --src /tmp/sample.go --dst /tmp/sample.sql
 INFO: 2023/11/07 20:49:39 ddlgen.go:44: source: /tmp/sample.go
 INFO: 2023/11/07 20:49:39 ddlgen.go:73: destination: /tmp/sample.sql
 
@@ -138,9 +138,9 @@ options:
         source file or directory
     --dst (env: DDLGEN_DESTINATION, default: /dev/stdout)
         destination file or directory
-    --column-key-go (env: DDLGEN_COLUMN_KEY_GO, default: db)
+    --column-tag-go (env: DDLGEN_COLUMN_TAG_GO, default: db)
         column annotation key for Go struct tag
-    --ddl-key-go (env: DDLGEN_DDL_KEY_GO, default: ddlgen)
+    --ddl-tag-go (env: DDLGEN_DDL_TAG_GO, default: ddlgen)
         DDL annotation key for Go struct tag
     --help (default: false)
         show usage

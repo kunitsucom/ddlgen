@@ -26,8 +26,8 @@ type config struct {
 	Source      string `json:"source"`
 	Destination string `json:"destination"`
 	// Golang
-	ColumnKeyGo string `json:"column_key_go"`
-	DDLKeyGo    string `json:"ddl_key_go"`
+	ColumnTagGo string `json:"column_tag_go"`
+	DDLTagGo    string `json:"ddl_tag_go"`
 }
 
 //nolint:gochecknoglobals
@@ -92,11 +92,11 @@ const (
 
 	// Golang
 
-	_OptionColumnKeyGo = "column-key-go"
-	_EnvKeyColumnKeyGo = "DDLGEN_COLUMN_KEY_GO"
+	_OptionColumnTagGo = "column-tag-go"
+	_EnvKeyColumnTagGo = "DDLGEN_COLUMN_TAG_GO"
 
-	_OptionDDLKeyGo = "ddl-key-go"
-	_EnvKeyDDLKeyGo = "DDLGEN_DDL_KEY_GO"
+	_OptionDDLTagGo = "ddl-tag-go"
+	_EnvKeyDDLTagGo = "DDLGEN_DDL_TAG_GO"
 )
 
 // MEMO: Since there is a possibility of returning some kind of error in the future, the signature is made to return an error.
@@ -156,14 +156,14 @@ func load(ctx context.Context) (cfg *config, err error) { //nolint:unparam
 			},
 			// Golang
 			&cliz.StringOption{
-				Name:        _OptionColumnKeyGo,
-				Environment: _EnvKeyColumnKeyGo,
+				Name:        _OptionColumnTagGo,
+				Environment: _EnvKeyColumnTagGo,
 				Description: "column annotation key for Go struct tag",
 				Default:     cliz.Default("db"),
 			},
 			&cliz.StringOption{
-				Name:        _OptionDDLKeyGo,
-				Environment: _EnvKeyDDLKeyGo,
+				Name:        _OptionDDLTagGo,
+				Environment: _EnvKeyDDLTagGo,
 				Description: "DDL annotation key for Go struct tag",
 				Default:     cliz.Default("ddlgen"),
 			},
@@ -183,8 +183,8 @@ func load(ctx context.Context) (cfg *config, err error) { //nolint:unparam
 		Dialect:     loadDialect(ctx, cmd),
 		Source:      loadSource(ctx, cmd),
 		Destination: loadDestination(ctx, cmd),
-		ColumnKeyGo: loadColumnKeyGo(ctx, cmd),
-		DDLKeyGo:    loadDDLKeyGo(ctx, cmd),
+		ColumnTagGo: loadColumnTagGo(ctx, cmd),
+		DDLTagGo:    loadDDLTagGo(ctx, cmd),
 	}
 
 	if c.Debug {

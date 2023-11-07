@@ -64,7 +64,7 @@ func walkDirFn(ctx context.Context, ddl *ddlast.DDL) func(path string, d os.DirE
 
 		stmts, err := parseFile(ctx, path)
 		if err != nil {
-			if errors.Is(err, apperr.ErrDDLKeyGoNotFoundInSource) {
+			if errors.Is(err, apperr.ErrDDLTagGoNotFoundInSource) {
 				logs.Debug.Printf("parseFile: %s: %v", path, err)
 				return nil
 			}
@@ -85,7 +85,7 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 		return nil, errorz.Errorf("parser.ParseFile: %w", err)
 	}
 
-	ddlSrc, err := extractDDLSourceFromDDLKeyGo(ctx, fset, f)
+	ddlSrc, err := extractDDLSourceFromDDLTagGo(ctx, fset, f)
 	if err != nil {
 		return nil, errorz.Errorf("extractDDLSource: %w", err)
 	}
@@ -138,13 +138,13 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 		// CREATE TABLE (default: struct name)
 		if createTableStmt.CreateTable == "" && r.TypeSpec != nil {
 			name := r.TypeSpec.Name.String()
-			createTableStmt.Comments = append(createTableStmt.Comments, fmt.Sprintf("NOTE: the comment does not have a key for table (%s: table: CREATE TABLE <table>), so the struct name \"%s\" is used as the table name.", config.DDLKeyGo(), name))
+			createTableStmt.Comments = append(createTableStmt.Comments, fmt.Sprintf("NOTE: the comment does not have a key for table (%s: table: CREATE TABLE <table>), so the struct name \"%s\" is used as the table name.", config.DDLTagGo(), name))
 			createTableStmt.SetCreateTable(name)
 		}
 
 		// CREATE TABLE (error)
 		if createTableStmt.CreateTable == "" {
-			createTableStmt.Comments = append(createTableStmt.Comments, fmt.Sprintf("ERROR: the comment does not have a key for table (%s: table: CREATE TABLE <table>), or the comment is not associated with struct.", config.DDLKeyGo()))
+			createTableStmt.Comments = append(createTableStmt.Comments, fmt.Sprintf("ERROR: the comment does not have a key for table (%s: table: CREATE TABLE <table>), or the comment is not associated with struct.", config.DDLTagGo()))
 		}
 
 		// columns
@@ -155,22 +155,22 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 				tag := reflect.StructTag(strings.Trim(field.Tag.Value, "`"))
 
 				// column name
-				switch columnName := tag.Get(config.ColumnKeyGo()); columnName {
+				switch columnName := tag.Get(config.ColumnTagGo()); columnName {
 				case "-":
-					createTableStmt.Comments = append(createTableStmt.Comments, fmt.Sprintf("NOTE: the struct has a tag for column name (`%s:\"-\"`), so the field is ignored.", config.ColumnKeyGo()))
+					createTableStmt.Comments = append(createTableStmt.Comments, fmt.Sprintf("NOTE: the struct has a tag for column name (`%s:\"-\"`), so the field is ignored.", config.ColumnTagGo()))
 					continue
 				case "":
 					name := field.Names[0].Name
-					column.Comments = append(column.Comments, fmt.Sprintf("NOTE: the struct does not have a tag for column name (`%s:\"<ColumnName>\"`), so the field name \"%s\" is used as the column name.", config.ColumnKeyGo(), name))
+					column.Comments = append(column.Comments, fmt.Sprintf("NOTE: the struct does not have a tag for column name (`%s:\"<ColumnName>\"`), so the field name \"%s\" is used as the column name.", config.ColumnTagGo(), name))
 					column.Column = name
 				default:
 					column.Column = columnName
 				}
 
 				// column type and constraint
-				switch columnTypeConstraint := tag.Get(config.DDLKeyGo()); columnTypeConstraint {
+				switch columnTypeConstraint := tag.Get(config.DDLTagGo()); columnTypeConstraint {
 				case "":
-					column.Comments = append(column.Comments, fmt.Sprintf("ERROR: the struct does not have a tag for column type and constraint (`%s:\"<TYPE> [CONSTRAINT]\"`)", config.DDLKeyGo()))
+					column.Comments = append(column.Comments, fmt.Sprintf("ERROR: the struct does not have a tag for column type and constraint (`%s:\"<TYPE> [CONSTRAINT]\"`)", config.DDLTagGo()))
 					column.TypeConstraint = "ERROR"
 				default:
 					column.TypeConstraint = columnTypeConstraint
@@ -178,7 +178,7 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 
 				// comments
 				comments := strings.Split(strings.Trim(field.Doc.Text(), "\n"), "\n")
-				column.Comments = append(column.Comments, langutil.TrimCommentElementTailEmpty(langutil.TrimCommentElementHasPrefix(comments, config.DDLKeyGo()))...)
+				column.Comments = append(column.Comments, langutil.TrimCommentElementTailEmpty(langutil.TrimCommentElementHasPrefix(comments, config.DDLTagGo()))...)
 
 				createTableStmt.Columns = append(createTableStmt.Columns, column)
 			}

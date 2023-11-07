@@ -26,8 +26,8 @@ func TestParse(t *testing.T) {
 			"--timestamp=2021-01-01T09:00:00+09:00",
 			"--lang=go",
 			"--dialect=spanner",
-			"--column-key-go=dbtest",
-			"--ddl-key-go=spanddl",
+			"--column-tag-go=dbtest",
+			"--ddl-tag-go=spanddl",
 			"--src=tests/common.source",
 			"--dst=dummy",
 		})
@@ -47,8 +47,8 @@ func TestParse(t *testing.T) {
 			"--timestamp=2021-01-01T09:00:00+09:00",
 			"--lang=go",
 			"--dialect=spanner",
-			"--column-key-go=dbtest",
-			"--ddl-key-go=spanddl",
+			"--column-tag-go=dbtest",
+			"--ddl-tag-go=spanddl",
 			"--src=tests",
 			"--dst=dummy",
 		})
@@ -77,8 +77,8 @@ func TestParse(t *testing.T) {
 			"--timestamp=2021-01-01T09:00:00+09:00",
 			"--lang=go",
 			"--dialect=spanner",
-			"--column-key-go=dbtest",
-			"--ddl-key-go=spanddl",
+			"--column-tag-go=dbtest",
+			"--ddl-tag-go=spanddl",
 			"--src=" + tempDir,
 			"--dst=dummy",
 		})
@@ -99,8 +99,8 @@ func TestParse(t *testing.T) {
 			"--timestamp=2021-01-01T09:00:00+09:00",
 			"--lang=go",
 			"--dialect=spanner",
-			"--column-key-go=dbtest",
-			"--ddl-key-go=spanddl",
+			"--column-tag-go=dbtest",
+			"--ddl-tag-go=spanddl",
 			"--src=tests/no-such-file.source",
 			"--dst=dummy",
 		})
@@ -123,8 +123,8 @@ func TestParse(t *testing.T) {
 			"--timestamp=2021-01-01T09:00:00+09:00",
 			"--lang=go",
 			"--dialect=spanner",
-			"--column-key-go=dbtest",
-			"--ddl-key-go=spanddl",
+			"--column-tag-go=dbtest",
+			"--ddl-tag-go=spanddl",
 			"--src=tests/no.source",
 			"--dst=dummy",
 		})
@@ -146,9 +146,9 @@ func TestParse(t *testing.T) {
 			"--timestamp=2021-01-01T09:00:00+09:00",
 			"--lang=go",
 			"--dialect=spanner",
-			"--column-key-go=dbtest",
-			"--ddl-key-go=spanddl",
-			"--src=tests/no-ddl-key-go.go",
+			"--column-tag-go=dbtest",
+			"--ddl-tag-go=spanddl",
+			"--src=tests/no-ddl-tag-go.go",
 			"--dst=dummy",
 		})
 
@@ -159,7 +159,7 @@ func TestParse(t *testing.T) {
 		{
 			_, err := Parse(ctx, config.Source())
 			require.Error(t, err)
-			assert.ErrorsIs(t, err, apperr.ErrDDLKeyGoNotFoundInSource)
+			assert.ErrorsIs(t, err, apperr.ErrDDLTagGoNotFoundInSource)
 		}
 	})
 }
@@ -175,8 +175,8 @@ func Test_walkDirFn(t *testing.T) {
 			"--timestamp=2021-01-01T09:00:00+09:00",
 			"--lang=go",
 			"--dialect=spanner",
-			"--column-key-go=dbtest",
-			"--ddl-key-go=spanddl",
+			"--column-tag-go=dbtest",
+			"--ddl-tag-go=spanddl",
 			"--src=tests",
 			"--dst=dummy",
 		})
