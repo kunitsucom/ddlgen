@@ -28,8 +28,8 @@ func Test_integrationtest_go_spanner(t *testing.T) {
 			"--timestamp=2021-01-01T09:00:00+09:00",
 			"--lang=go",
 			"--dialect=spanner",
-			"--column-key-go=dbtest",
-			"--ddl-key-go=spanddl",
+			"--column-tag-go=dbtest",
+			"--ddl-tag-go=spanddl",
 			"--src=integrationtest_go_001.source",
 			"--dst=dummy",
 		})
