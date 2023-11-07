@@ -12,11 +12,15 @@ import (
 
 //nolint:gochecknoglobals
 var (
-	Trace Logger = logger{log.New(io.Discard, "TRACE: ", log.Ldate|log.Ltime|log.Lshortfile)}
-	Debug Logger = logger{log.New(io.Discard, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)}
+	Trace Logger = NewDiscard() //nolint:revive
+	Debug Logger = NewDiscard() //nolint:revive
 	Info  Logger = logger{log.New(os.Stderr, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)}
 	Warn  Logger = logger{log.New(os.Stderr, "WARN: ", log.Ldate|log.Ltime|log.Lshortfile)}
 )
+
+func NewDiscard() Logger { //nolint:ireturn
+	return logger{log.New(io.Discard, "", 0)}
+}
 
 func NewTrace() Logger { //nolint:ireturn
 	return logger{log.New(os.Stderr, "TRACE: ", log.Ldate|log.Ltime|log.Lshortfile)}

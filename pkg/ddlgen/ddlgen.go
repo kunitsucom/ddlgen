@@ -15,7 +15,7 @@ import (
 	"github.com/kunitsucom/ddlgen/internal/config"
 	"github.com/kunitsucom/ddlgen/internal/contexts"
 	ddlast "github.com/kunitsucom/ddlgen/internal/ddlgen/ddl"
-	"github.com/kunitsucom/ddlgen/internal/ddlgen/ddl/diarect/spanner"
+	"github.com/kunitsucom/ddlgen/internal/ddlgen/ddl/dialect/spanner"
 	ddlgengo "github.com/kunitsucom/ddlgen/internal/ddlgen/lang/go"
 	"github.com/kunitsucom/ddlgen/internal/logs"
 	apperr "github.com/kunitsucom/ddlgen/pkg/errors"
