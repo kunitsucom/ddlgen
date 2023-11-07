@@ -30,8 +30,8 @@ func (*CreateTableStmt) private() {}
 
 //nolint:gochecknoglobals
 var stmtRegexCreateTable = &util.StmtRegex{
-	Regex: regexp.MustCompile(`\s*CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?(\S+)`),
-	Index: 2,
+	Regex: regexp.MustCompile(`(?i)\s*CREATE\s+(.*)?TABLE\s+(.*)?(\S+)`),
+	Index: 3,
 }
 
 func (stmt *CreateTableStmt) SetCreateTable(createTable string) {
