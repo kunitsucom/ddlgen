@@ -59,16 +59,16 @@ func extractDDLSourceFromDDLTagGo(_ context.Context, fset *token.FileSet, f *goa
 				logs.Trace.Printf("commentLine=%s: %s", filepathz.Short(fset.Position(commentGroup.Pos()).String()), commentLine)
 				// NOTE: If the comment line matches the DDLTagGo, it is assumed to be a comment line for the struct.
 				if matches := DDLTagGoCommentLineRegex().FindStringSubmatch(commentLine); len(matches) > _DDLTagGoCommentLineRegexContentIndex {
-					r := &ddlSource{
+					s := &ddlSource{
 						CommentGroup: commentGroup,
 					}
 					goast.Inspect(commentedNode, func(node goast.Node) bool {
 						switch n := node.(type) {
 						case *goast.TypeSpec:
-							r.TypeSpec = n
+							s.TypeSpec = n
 							switch t := n.Type.(type) {
 							case *goast.StructType:
-								r.StructType = t
+								s.StructType = t
 								return false
 							default: // noop
 							}
@@ -76,7 +76,7 @@ func extractDDLSourceFromDDLTagGo(_ context.Context, fset *token.FileSet, f *goa
 						}
 						return true
 					})
-					ddlSrc = append(ddlSrc, r)
+					ddlSrc = append(ddlSrc, s)
 					break CommentGroupLoop // NOTE: There may be multiple "DDLTagGo"s in the same commentGroup, so once you find the first one, break.
 				}
 			}
