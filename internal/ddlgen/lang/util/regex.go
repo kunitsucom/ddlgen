@@ -10,19 +10,19 @@ type StmtRegex struct {
 //nolint:gochecknoglobals
 var (
 	StmtRegexCreateTable = StmtRegex{
-		Regex: regexp.MustCompile(`\s*\S+:\s*tables?\s*:\s*((CREATE\s+TABLE\s+)?.*)`),
+		Regex: regexp.MustCompile(`\s*\S+:\s*tables?\s*:\s*((CREATE\s+TABLE\s+)?\S+.*)`),
 		Index: 1,
 	}
 	StmtRegexCreateTableConstraint = StmtRegex{
-		Regex: regexp.MustCompile(`\s*\S+:\s*constraints?\s*:\s*(.*)`),
+		Regex: regexp.MustCompile(`\s*\S+:\s*constraints?\s*:\s*(\S+.*)`),
 		Index: 1,
 	}
 	StmtRegexCreateTableOptions = StmtRegex{
-		Regex: regexp.MustCompile(`\s*\S+:\s*options?\s*:\s*(.*)`),
+		Regex: regexp.MustCompile(`\s*\S+:\s*options?\s*:\s*(\S+.*)`),
 		Index: 1,
 	}
 	StmtRegexCreateIndex = StmtRegex{
-		Regex: regexp.MustCompile(`\s*\S+:\s*index(es)?\s*:\s*(.*)`),
+		Regex: regexp.MustCompile(`\s*\S+:\s*index(es)?\s*:\s*(\S+.*)`),
 		Index: 2,
 	}
 )

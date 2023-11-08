@@ -32,12 +32,11 @@ var (
 )
 
 const (
-	//	                                       _______________________ <- 1. comment prefix
-	//	                                                                __ <- 2. tag name
-	//	                                                                        __ <- 3. tag value
-	//	                                                                                ___ <- 4. comment suffix
-	_DDLTagGoCommentLineRegexFormat       = `^(\s*//+\s*|\s*/\*\s*|\s*)(%s):\s*(.*)?\s*(\*/)?`
-	_DDLTagGoCommentLineRegexContentIndex = /*                                  ^^ */ 3
+	//	                                          ________________ <- 1. comment prefix
+	//	                                                          __ <- 2. tag name
+	//	                                                                          ___ <- 4. comment suffix
+	_DDLTagGoCommentLineRegexFormat       = `^\s*(//+\s*|/\*\s*)?(%s):\s*(.*)?\s*(\*/)?`
+	_DDLTagGoCommentLineRegexContentIndex = /*                            ^^ 3. tag value */ 3
 )
 
 func DDLTagGoCommentLineRegex() *regexp.Regexp {
@@ -60,23 +59,24 @@ func extractDDLSourceFromDDLTagGo(_ context.Context, fset *token.FileSet, f *goa
 				logs.Trace.Printf("commentLine=%s: %s", filepathz.Short(fset.Position(commentGroup.Pos()).String()), commentLine)
 				// NOTE: If the comment line matches the DDLTagGo, it is assumed to be a comment line for the struct.
 				if matches := DDLTagGoCommentLineRegex().FindStringSubmatch(commentLine); len(matches) > _DDLTagGoCommentLineRegexContentIndex {
-					r := &ddlSource{
+					s := &ddlSource{
 						CommentGroup: commentGroup,
 					}
 					goast.Inspect(commentedNode, func(node goast.Node) bool {
 						switch n := node.(type) {
 						case *goast.TypeSpec:
-							r.TypeSpec = n
-							// NOTE: Continue searching deeper until StructType appears.
-							return true
-						case *goast.StructType:
-							r.StructType = n
-							return false
-						default:
-							return true
+							s.TypeSpec = n
+							switch t := n.Type.(type) {
+							case *goast.StructType:
+								s.StructType = t
+								return false
+							default: // noop
+							}
+						default: // noop
 						}
+						return true
 					})
-					ddlSrc = append(ddlSrc, r)
+					ddlSrc = append(ddlSrc, s)
 					break CommentGroupLoop // NOTE: There may be multiple "DDLTagGo"s in the same commentGroup, so once you find the first one, break.
 				}
 			}
@@ -84,7 +84,7 @@ func extractDDLSourceFromDDLTagGo(_ context.Context, fset *token.FileSet, f *goa
 	}
 
 	if len(ddlSrc) == 0 {
-		return nil, errorz.Errorf("ddl-tag-go=%s: %w", config.DDLTagGo(), apperr.ErrDDLTagGoNotFoundInSource)
+		return nil, errorz.Errorf("ddl-tag-go=%s: %w", config.DDLTagGo(), apperr.ErrDDLTagGoAnnotationNotFoundInSource)
 	}
 
 	return ddlSrc, nil
