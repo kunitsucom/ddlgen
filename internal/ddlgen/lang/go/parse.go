@@ -87,7 +87,7 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 
 	ddlSrc, err := extractDDLSourceFromDDLTagGo(ctx, fset, f)
 	if err != nil {
-		return nil, errorz.Errorf("extractDDLSource: %w", err)
+		return nil, errorz.Errorf("extractDDLSourceFromDDLTagGo: %w", err)
 	}
 
 	dumpDDLSource(fset, ddlSrc)
