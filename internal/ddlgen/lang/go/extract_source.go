@@ -34,9 +34,9 @@ var (
 const (
 	//	                                          ________________ <- 1. comment prefix
 	//	                                                          __ <- 2. tag name
-	//	                                                                          ___ <- 4. comment suffix
-	_DDLTagGoCommentLineRegexFormat       = `^\s*(//+\s*|/\*\s*)?(%s):\s*(.*)?\s*(\*/)?`
-	_DDLTagGoCommentLineRegexContentIndex = /*                            ^^ 3. tag value */ 3
+	//	                                                                             ___ <- 4. comment suffix
+	_DDLTagGoCommentLineRegexFormat       = `^\s*(//+\s*|/\*\s*)?(%s)\s*:\s*(.*)?\s*(\*/)?`
+	_DDLTagGoCommentLineRegexContentIndex = /*                               ^^ 3. tag value */ 3
 )
 
 func DDLTagGoCommentLineRegex() *regexp.Regexp {
