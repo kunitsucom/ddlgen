@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	errorz "github.com/kunitsucom/util.go/errors"
+	filepathz "github.com/kunitsucom/util.go/path/filepath"
 
 	"github.com/kunitsucom/ddlgen/internal/config"
 	ddlast "github.com/kunitsucom/ddlgen/internal/ddlgen/ddl"
@@ -52,13 +53,16 @@ func Parse(ctx context.Context, src string) (*ddlast.DDL, error) {
 	return ddl, nil
 }
 
+//nolint:gochecknoglobals
+var fileSuffix = ".go"
+
 func walkDirFn(ctx context.Context, ddl *ddlast.DDL) func(path string, d os.DirEntry, err error) error {
 	return func(path string, d os.DirEntry, err error) error {
 		if err != nil {
 			return err //nolint:wrapcheck
 		}
 
-		if d.IsDir() || !strings.HasSuffix(path, ".go") || strings.HasSuffix(path, "_test.go") {
+		if d.IsDir() || !strings.HasSuffix(path, fileSuffix) || strings.HasSuffix(path, "_test.go") {
 			return nil
 		}
 
@@ -136,15 +140,11 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 		}
 
 		// CREATE TABLE (default: struct name)
-		if createTableStmt.CreateTable == "" && r.TypeSpec != nil {
+		if r.TypeSpec != nil && createTableStmt.CreateTable == "" {
 			name := r.TypeSpec.Name.String()
-			createTableStmt.Comments = append(createTableStmt.Comments, fmt.Sprintf("NOTE: the comment does not have a key for table (%s: table: CREATE TABLE <table>), so the struct name \"%s\" is used as the table name.", config.DDLTagGo(), name))
+			source := fset.Position(r.CommentGroup.Pos())
+			createTableStmt.Comments = append(createTableStmt.Comments, fmt.Sprintf("WARN: the comment (%s:%d) does not have a key for table (%s: table: CREATE TABLE <table>), so the struct name \"%s\" is used as the table name.", filepathz.Short(source.Filename), source.Line, config.DDLTagGo(), name))
 			createTableStmt.SetCreateTable(name)
-		}
-
-		// CREATE TABLE (error)
-		if createTableStmt.CreateTable == "" {
-			createTableStmt.Comments = append(createTableStmt.Comments, fmt.Sprintf("ERROR: the comment does not have a key for table (%s: table: CREATE TABLE <table>), or the comment is not associated with struct.", config.DDLTagGo()))
 		}
 
 		// columns
@@ -157,7 +157,7 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 				// column name
 				switch columnName := tag.Get(config.ColumnTagGo()); columnName {
 				case "-":
-					createTableStmt.Comments = append(createTableStmt.Comments, fmt.Sprintf("NOTE: the struct has a tag for column name (`%s:\"-\"`), so the field is ignored.", config.ColumnTagGo()))
+					createTableStmt.Comments = append(createTableStmt.Comments, fmt.Sprintf("NOTE: the \"%s\" struct's field \"%s\" has a tag for column name (`%s:\"-\"`), so the field is ignored.", r.TypeSpec.Name, field.Names[0], config.ColumnTagGo()))
 					continue
 				case "":
 					name := field.Names[0].Name
@@ -182,6 +182,16 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 
 				createTableStmt.Columns = append(createTableStmt.Columns, column)
 			}
+		}
+
+		if createTableStmt.CreateTable == "" {
+			// CREATE TABLE (ERROR)
+			source := fset.Position(r.CommentGroup.Pos())
+			createTableStmt.Comments = append(createTableStmt.Comments, fmt.Sprintf("WARN: the comment (%s:%d) does not have a key for table (%s: table: CREATE TABLE <table>), or the comment is not associated with struct.", filepathz.Short(source.Filename), source.Line, config.DDLTagGo()))
+		} else if len(createTableStmt.Columns) == 0 {
+			// columns (ERROR)
+			source := fset.Position(r.CommentGroup.Pos())
+			createTableStmt.Comments = append(createTableStmt.Comments, fmt.Sprintf("ERROR: the comment (%s:%d) does not have struct fields for column type and constraint (`%s:\"<TYPE> [CONSTRAINT]\"`), or the comment is not associated with struct.", filepathz.Short(source.Filename), source.Line, config.DDLTagGo()))
 		}
 
 		stmts = append(stmts, createTableStmt)

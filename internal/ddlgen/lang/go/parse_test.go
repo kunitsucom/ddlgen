@@ -38,7 +38,11 @@ func TestParse(t *testing.T) {
 		ctx = contexts.WithNowString(ctx, time.RFC3339, config.Timestamp())
 		ddl, err := Parse(ctx, config.Source())
 		require.NoError(t, err)
-		assert.Equal(t, len(ddl.Stmts), 7)
+		if !assert.Equal(t, 9, len(ddl.Stmts)) {
+			for _, stmt := range ddl.Stmts {
+				t.Logf("🚧: ddl.Stmts: %#v", stmt)
+			}
+		}
 	})
 
 	t.Run("success,info.IsDir", func(t *testing.T) {
@@ -56,11 +60,19 @@ func TestParse(t *testing.T) {
 		_, err := config.Load(ctx)
 		require.NoError(t, err)
 
+		backup := fileSuffix
+		t.Cleanup(func() { fileSuffix = backup })
+		fileSuffix = ".source"
+
 		ctx = contexts.WithNowString(ctx, time.RFC3339, config.Timestamp())
 		{
 			ddl, err := Parse(ctx, config.Source())
 			require.NoError(t, err)
-			assert.Equal(t, len(ddl.Stmts), 1)
+			if !assert.Equal(t, 10, len(ddl.Stmts)) {
+				for _, stmt := range ddl.Stmts {
+					t.Logf("🚧: ddl.Stmts: %#v", stmt)
+				}
+			}
 		}
 	})
 
@@ -125,7 +137,7 @@ func TestParse(t *testing.T) {
 			"--dialect=spanner",
 			"--column-tag-go=dbtest",
 			"--ddl-tag-go=spanddl",
-			"--src=tests/no.source",
+			"--src=tests/no.errsource",
 			"--dst=dummy",
 		})
 
@@ -148,7 +160,7 @@ func TestParse(t *testing.T) {
 			"--dialect=spanner",
 			"--column-tag-go=dbtest",
 			"--ddl-tag-go=spanddl",
-			"--src=tests/no-ddl-tag-go.go",
+			"--src=tests/no-ddl-tag-go.source",
 			"--dst=dummy",
 		})
 

@@ -16,6 +16,24 @@ type (
 		Email string `dbtest:"Email" spanddl:"STRING(255) NOT NULL"`
 		// Age is a user age.
 		Age int      `dbtest:"Age"   spanddl:"INT64       NOT NULL"`
+		// Ignore is a ignore field.
+		Ignore string `dbtest:"-"    spanddl:"-"`
+	}
+
+	// Users is a user array.
+	// This type is expected not to be detected.
+	//
+	// spanddl: table: `UserArrays`
+	Users []*User
+
+	// Group is a group.
+	//
+	// spanddl:table:
+	Group struct {
+		// ID is a group ID.
+		ID string   `dbtest:"Id"   spanddl:"STRING(36)  NOT NULL"`
+		// Name is a group name.
+		Name string `dbtest:"Name" spanddl:"STRING(255) NOT NULL"`
 	}
 
 	// Book is a book.
