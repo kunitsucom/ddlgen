@@ -24,6 +24,8 @@ import (
 	apperr "github.com/kunitsucom/ddlgen/pkg/errors"
 )
 
+const Language = "go"
+
 //nolint:cyclop
 func Parse(ctx context.Context, src string) (*ddlast.DDL, error) {
 	// MEMO: get absolute path for parser.ParseFile()
