@@ -96,7 +96,7 @@ CREATE UNIQUE INDEX IndexGroupsName ON Groups(Name);
 ### pre-built binary
 
 ```bash
-VERSION=v0.0.4
+VERSION=v0.0.5
 
 # download
 curl -fLROSs https://github.com/kunitsucom/ddlgen/releases/download/${VERSION}/ddlgen_${VERSION}_darwin_arm64.zip

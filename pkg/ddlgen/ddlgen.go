@@ -85,25 +85,25 @@ func DDLGen(ctx context.Context) error {
 
 func parse(ctx context.Context, src string) (*ddlast.DDL, error) {
 	switch language := config.Language(); language {
-	case "go":
+	case ddlgengo.Language:
 		ddl, err := ddlgengo.Parse(ctx, src)
 		if err != nil {
 			return nil, errorz.Errorf("ddlgengo.Parse: %w", err)
 		}
 		return ddl, nil
 	default:
-		return nil, errorz.Errorf("unknown language: %s", language)
+		return nil, errorz.Errorf("language=%s: %w", language, apperr.ErrNotSupported)
 	}
 }
 
 func fprint(w io.Writer, ddl *ddlast.DDL) error {
-	switch config.Dialect() {
+	switch dialect := config.Dialect(); dialect {
 	case spanner.Dialect:
 		if err := spanner.Fprint(w, ddl); err != nil {
 			return errorz.Errorf("spanner.Fprint: %w", err)
 		}
 		return nil
 	default:
-		return errorz.Errorf("dialect=%s: %w", config.Dialect(), apperr.ErrNotSupported)
+		return errorz.Errorf("dialect=%s: %w", dialect, apperr.ErrNotSupported)
 	}
 }
