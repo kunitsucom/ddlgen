@@ -64,7 +64,7 @@ func walkDirFn(ctx context.Context, ddl *ddlast.DDL) func(path string, d os.DirE
 
 		stmts, err := parseFile(ctx, path)
 		if err != nil {
-			if errors.Is(err, apperr.ErrDDLTagGoNotFoundInSource) {
+			if errors.Is(err, apperr.ErrDDLTagGoAnnotationNotFoundInSource) {
 				logs.Debug.Printf("parseFile: %s: %v", path, err)
 				return nil
 			}

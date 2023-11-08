@@ -67,14 +67,15 @@ func extractDDLSourceFromDDLTagGo(_ context.Context, fset *token.FileSet, f *goa
 						switch n := node.(type) {
 						case *goast.TypeSpec:
 							r.TypeSpec = n
-							// NOTE: Continue searching deeper until StructType appears.
-							return true
-						case *goast.StructType:
-							r.StructType = n
-							return false
-						default:
-							return true
+							switch t := n.Type.(type) {
+							case *goast.StructType:
+								r.StructType = t
+								return false
+							default: // noop
+							}
+						default: // noop
 						}
+						return true
 					})
 					ddlSrc = append(ddlSrc, r)
 					break CommentGroupLoop // NOTE: There may be multiple "DDLTagGo"s in the same commentGroup, so once you find the first one, break.
@@ -84,7 +85,7 @@ func extractDDLSourceFromDDLTagGo(_ context.Context, fset *token.FileSet, f *goa
 	}
 
 	if len(ddlSrc) == 0 {
-		return nil, errorz.Errorf("ddl-tag-go=%s: %w", config.DDLTagGo(), apperr.ErrDDLTagGoNotFoundInSource)
+		return nil, errorz.Errorf("ddl-tag-go=%s: %w", config.DDLTagGo(), apperr.ErrDDLTagGoAnnotationNotFoundInSource)
 	}
 
 	return ddlSrc, nil

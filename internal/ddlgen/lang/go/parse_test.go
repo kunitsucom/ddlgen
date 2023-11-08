@@ -159,7 +159,7 @@ func TestParse(t *testing.T) {
 		{
 			_, err := Parse(ctx, config.Source())
 			require.Error(t, err)
-			assert.ErrorsIs(t, err, apperr.ErrDDLTagGoNotFoundInSource)
+			assert.ErrorsIs(t, err, apperr.ErrDDLTagGoAnnotationNotFoundInSource)
 		}
 	})
 }
