@@ -103,9 +103,8 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 		createTableStmt := &ddlast.CreateTableStmt{}
 
 		// source
-		source := fset.Position(r.CommentGroup.Pos())
-		createTableStmt.SourceFile = source.Filename
-		createTableStmt.SourceLine = source.Line
+		createTableStmt.SourceFile = r.Position.Filename
+		createTableStmt.SourceLine = r.Position.Line
 
 		// CREATE TABLE (or INDEX) / CONSTRAINT / OPTIONS (from comments)
 		comments := strings.Split(strings.Trim(r.CommentGroup.Text(), "\n"), "\n")

@@ -6,7 +6,6 @@ import (
 	goast "go/ast"
 	"go/token"
 	"regexp"
-	"strings"
 	"sync"
 
 	errorz "github.com/kunitsucom/util.go/errors"
@@ -18,6 +17,7 @@ import (
 )
 
 type ddlSource struct {
+	Position token.Position
 	// TypeSpec is used to guess the table name if the CREATE TABLE annotation is not found.
 	TypeSpec *goast.TypeSpec
 	// StructType is used to determine the column name. If the tag specified by --column-tag-go is not found, the field name is used.
@@ -34,9 +34,9 @@ var (
 const (
 	//	                                          ________________ <- 1. comment prefix
 	//	                                                          __ <- 2. tag name
-	//	                                                                          ___ <- 4. comment suffix
-	_DDLTagGoCommentLineRegexFormat       = `^\s*(//+\s*|/\*\s*)?(%s):\s*(.*)?\s*(\*/)?`
-	_DDLTagGoCommentLineRegexContentIndex = /*                            ^^ 3. tag value */ 3
+	//	                                                                             ___ <- 4. comment suffix
+	_DDLTagGoCommentLineRegexFormat       = `^\s*(//+\s*|/\*\s*)?(%s)\s*:\s*(.*)?\s*(\*/)?`
+	_DDLTagGoCommentLineRegexContentIndex = /*                               ^^ 3. tag value */ 3
 )
 
 func DDLTagGoCommentLineRegex() *regexp.Regexp {
@@ -53,13 +53,13 @@ func extractDDLSourceFromDDLTagGo(_ context.Context, fset *token.FileSet, f *goa
 
 	for commentedNode, commentGroups := range goast.NewCommentMap(fset, f, f.Comments) {
 		for _, commentGroup := range commentGroups {
-			commentLines := strings.Split(strings.TrimSuffix(commentGroup.Text(), "\n"), "\n")
 		CommentGroupLoop:
-			for _, commentLine := range commentLines {
-				logs.Trace.Printf("commentLine=%s: %s", filepathz.Short(fset.Position(commentGroup.Pos()).String()), commentLine)
+			for _, commentLine := range commentGroup.List {
+				logs.Trace.Printf("commentLine=%s: %s", filepathz.Short(fset.Position(commentGroup.Pos()).String()), commentLine.Text)
 				// NOTE: If the comment line matches the DDLTagGo, it is assumed to be a comment line for the struct.
-				if matches := DDLTagGoCommentLineRegex().FindStringSubmatch(commentLine); len(matches) > _DDLTagGoCommentLineRegexContentIndex {
+				if matches := DDLTagGoCommentLineRegex().FindStringSubmatch(commentLine.Text); len(matches) > _DDLTagGoCommentLineRegexContentIndex {
 					s := &ddlSource{
+						Position:     fset.Position(commentLine.Pos()),
 						CommentGroup: commentGroup,
 					}
 					goast.Inspect(commentedNode, func(node goast.Node) bool {
