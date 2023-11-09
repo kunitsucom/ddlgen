@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
 
 	"github.com/kunitsucom/util.go/testing/assert"
 	"github.com/kunitsucom/util.go/testing/require"
@@ -23,7 +22,6 @@ func TestParse(t *testing.T) {
 	t.Run("success,common.source", func(t *testing.T) {
 		ctx := contexts.WithArgs(context.Background(), []string{
 			"ddlgen",
-			"--timestamp=2021-01-01T09:00:00+09:00",
 			"--lang=go",
 			"--dialect=spanner",
 			"--column-tag-go=dbtest",
@@ -35,7 +33,6 @@ func TestParse(t *testing.T) {
 		_, err := config.Load(ctx)
 		require.NoError(t, err)
 
-		ctx = contexts.WithNowString(ctx, time.RFC3339, config.Timestamp())
 		ddl, err := Parse(ctx, config.Source())
 		require.NoError(t, err)
 		if !assert.Equal(t, 9, len(ddl.Stmts)) {
@@ -48,7 +45,6 @@ func TestParse(t *testing.T) {
 	t.Run("success,info.IsDir", func(t *testing.T) {
 		ctx := contexts.WithArgs(context.Background(), []string{
 			"ddlgen",
-			"--timestamp=2021-01-01T09:00:00+09:00",
 			"--lang=go",
 			"--dialect=spanner",
 			"--column-tag-go=dbtest",
@@ -64,7 +60,6 @@ func TestParse(t *testing.T) {
 		t.Cleanup(func() { fileSuffix = backup })
 		fileSuffix = ".source"
 
-		ctx = contexts.WithNowString(ctx, time.RFC3339, config.Timestamp())
 		{
 			ddl, err := Parse(ctx, config.Source())
 			require.NoError(t, err)
@@ -86,7 +81,6 @@ func TestParse(t *testing.T) {
 
 		ctx := contexts.WithArgs(context.Background(), []string{
 			"ddlgen",
-			"--timestamp=2021-01-01T09:00:00+09:00",
 			"--lang=go",
 			"--dialect=spanner",
 			"--column-tag-go=dbtest",
@@ -98,7 +92,6 @@ func TestParse(t *testing.T) {
 		_, err := config.Load(ctx)
 		require.NoError(t, err)
 
-		ctx = contexts.WithNowString(ctx, time.RFC3339, config.Timestamp())
 		{
 			_, err := Parse(ctx, config.Source())
 			require.ErrorsContains(t, err, "expected 'package', found 'EOF'")
@@ -108,7 +101,6 @@ func TestParse(t *testing.T) {
 	t.Run("failure,os.ErrNotExist", func(t *testing.T) {
 		ctx := contexts.WithArgs(context.Background(), []string{
 			"ddlgen",
-			"--timestamp=2021-01-01T09:00:00+09:00",
 			"--lang=go",
 			"--dialect=spanner",
 			"--column-tag-go=dbtest",
@@ -120,7 +112,6 @@ func TestParse(t *testing.T) {
 		_, err := config.Load(ctx)
 		require.NoError(t, err)
 
-		ctx = contexts.WithNowString(ctx, time.RFC3339, config.Timestamp())
 		{
 			t.Setenv("PWD", "\\")
 			_, err := Parse(ctx, config.Source())
@@ -132,7 +123,6 @@ func TestParse(t *testing.T) {
 	t.Run("failure,parser.ParseFile", func(t *testing.T) {
 		ctx := contexts.WithArgs(context.Background(), []string{
 			"ddlgen",
-			"--timestamp=2021-01-01T09:00:00+09:00",
 			"--lang=go",
 			"--dialect=spanner",
 			"--column-tag-go=dbtest",
@@ -144,7 +134,6 @@ func TestParse(t *testing.T) {
 		_, err := config.Load(ctx)
 		require.NoError(t, err)
 
-		ctx = contexts.WithNowString(ctx, time.RFC3339, config.Timestamp())
 		{
 			_, err := Parse(ctx, config.Source())
 			require.Error(t, err)
@@ -155,7 +144,6 @@ func TestParse(t *testing.T) {
 	t.Run("failure,extractDDLSource", func(t *testing.T) {
 		ctx := contexts.WithArgs(context.Background(), []string{
 			"ddlgen",
-			"--timestamp=2021-01-01T09:00:00+09:00",
 			"--lang=go",
 			"--dialect=spanner",
 			"--column-tag-go=dbtest",
@@ -167,7 +155,6 @@ func TestParse(t *testing.T) {
 		_, err := config.Load(ctx)
 		require.NoError(t, err)
 
-		ctx = contexts.WithNowString(ctx, time.RFC3339, config.Timestamp())
 		{
 			_, err := Parse(ctx, config.Source())
 			require.Error(t, err)
@@ -184,7 +171,6 @@ func Test_walkDirFn(t *testing.T) {
 
 		ctx := contexts.WithArgs(context.Background(), []string{
 			"ddlgen",
-			"--timestamp=2021-01-01T09:00:00+09:00",
 			"--lang=go",
 			"--dialect=spanner",
 			"--column-tag-go=dbtest",
@@ -196,7 +182,6 @@ func Test_walkDirFn(t *testing.T) {
 		_, err := config.Load(ctx)
 		require.NoError(t, err)
 
-		ctx = contexts.WithNowString(ctx, time.RFC3339, config.Timestamp())
 		ddl := ddlast.NewDDL(ctx)
 		fn := walkDirFn(ctx, ddl)
 		{

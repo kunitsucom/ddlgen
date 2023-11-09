@@ -7,13 +7,11 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"time"
 
 	errorz "github.com/kunitsucom/util.go/errors"
 	cliz "github.com/kunitsucom/util.go/exp/cli"
 
 	"github.com/kunitsucom/ddlgen/internal/config"
-	"github.com/kunitsucom/ddlgen/internal/contexts"
 	ddlast "github.com/kunitsucom/ddlgen/internal/ddlgen/ddl"
 	"github.com/kunitsucom/ddlgen/internal/ddlgen/ddl/dialect/spanner"
 	ddlgengo "github.com/kunitsucom/ddlgen/internal/ddlgen/lang/go"
@@ -37,8 +35,6 @@ func DDLGen(ctx context.Context) error {
 		fmt.Printf("build timestamp: %s\n", config.BuildTimestamp()) //nolint:forbidigo
 		return nil
 	}
-
-	ctx = contexts.WithNowString(ctx, time.RFC3339, config.Timestamp())
 
 	src := config.Source()
 	logs.Info.Printf("source: %s", src)

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/kunitsucom/util.go/testing/assert"
 	"github.com/kunitsucom/util.go/testing/require"
@@ -25,7 +24,6 @@ func Test_integrationtest_go_spanner(t *testing.T) {
 
 		ctx := contexts.WithArgs(context.Background(), []string{
 			"ddlgen",
-			"--timestamp=2021-01-01T09:00:00+09:00",
 			"--lang=go",
 			"--dialect=spanner",
 			"--column-tag-go=dbtest",
@@ -36,8 +34,6 @@ func Test_integrationtest_go_spanner(t *testing.T) {
 
 		_, err := config.Load(ctx)
 		require.NoError(t, err)
-
-		ctx = contexts.WithNowString(ctx, time.RFC3339, config.Timestamp())
 
 		ddl, err := ddlgengo.Parse(ctx, config.Source())
 		require.NoError(t, err)

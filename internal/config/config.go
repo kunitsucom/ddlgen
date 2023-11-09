@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"sync"
-	"time"
 
 	errorz "github.com/kunitsucom/util.go/errors"
 	cliz "github.com/kunitsucom/util.go/exp/cli"
@@ -20,7 +19,6 @@ type config struct {
 	Version     bool   `json:"version"`
 	Trace       bool   `json:"trace"`
 	Debug       bool   `json:"debug"`
-	Timestamp   string `json:"timestamp"`
 	Language    string `json:"language"`
 	Dialect     string `json:"dialect"`
 	Source      string `json:"source"`
@@ -75,9 +73,6 @@ const (
 	_OptionDebug = "debug"
 	_EnvKeyDebug = "DDLGEN_DEBUG"
 
-	_OptionTimestamp = "timestamp"
-	_EnvKeyTimestamp = "DDLGEN_TIMESTAMP"
-
 	_OptionLanguage = "lang"
 	_EnvKeyLanguage = "DDLGEN_LANGUAGE"
 
@@ -123,12 +118,6 @@ func load(ctx context.Context) (cfg *config, err error) { //nolint:unparam
 				Environment: _EnvKeyDebug,
 				Description: "debug mode",
 				Default:     cliz.Default(false),
-			},
-			&cliz.StringOption{
-				Name:        _OptionTimestamp,
-				Environment: _EnvKeyTimestamp,
-				Description: "code generation timestamp",
-				Default:     cliz.Default(time.Now().Format(time.RFC3339)),
 			},
 			&cliz.StringOption{
 				Name:        _OptionLanguage,
@@ -178,7 +167,6 @@ func load(ctx context.Context) (cfg *config, err error) { //nolint:unparam
 		Version:     loadVersion(ctx, cmd),
 		Trace:       loadTrace(ctx, cmd),
 		Debug:       loadDebug(ctx, cmd),
-		Timestamp:   loadTimestamp(ctx, cmd),
 		Language:    loadLanguage(ctx, cmd),
 		Dialect:     loadDialect(ctx, cmd),
 		Source:      loadSource(ctx, cmd),

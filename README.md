@@ -128,8 +128,6 @@ options:
         trace mode enabled
     --debug (env: DDLGEN_DEBUG, default: false)
         debug mode
-    --timestamp (env: DDLGEN_TIMESTAMP, default: 2023-11-07T21:09:43+09:00)
-        code generation timestamp
     --lang (env: DDLGEN_LANGUAGE, default: go)
         programming language to generate DDL
     --dialect (env: DDLGEN_DIALECT, default: )
