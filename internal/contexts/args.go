@@ -15,6 +15,6 @@ func Args(ctx context.Context) []string {
 	return os.Args[0:]
 }
 
-func WithArgs(ctx context.Context, now []string) context.Context {
-	return context.WithValue(ctx, contextKeyArgs{}, now)
+func WithArgs(ctx context.Context, args []string) context.Context {
+	return context.WithValue(ctx, contextKeyArgs{}, args)
 }
