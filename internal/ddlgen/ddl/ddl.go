@@ -10,7 +10,7 @@ type DDL struct {
 	Stmts  []Stmt
 }
 
-func NewDDL(ctx context.Context) *DDL {
+func NewDDL(_ context.Context) *DDL {
 	return &DDL{
 		Indent: "    ",
 		Header: []string{
