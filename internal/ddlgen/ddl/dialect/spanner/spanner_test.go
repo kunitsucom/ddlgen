@@ -125,6 +125,6 @@ INTERLEAVE IN PARENT SpanParents ON DELETE CASCADE;
 
 		err := Fprint(w, ddl)
 		require.Error(t, err)
-		require.ErrorsIs(t, err, io.ErrUnexpectedEOF)
+		require.ErrorIs(t, err, io.ErrUnexpectedEOF)
 	})
 }

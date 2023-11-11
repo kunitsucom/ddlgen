@@ -94,7 +94,7 @@ func TestParse(t *testing.T) {
 
 		{
 			_, err := Parse(ctx, config.Source())
-			require.ErrorsContains(t, err, "expected 'package', found 'EOF'")
+			require.ErrorContains(t, err, "expected 'package', found 'EOF'")
 		}
 	})
 
@@ -116,7 +116,7 @@ func TestParse(t *testing.T) {
 			t.Setenv("PWD", "\\")
 			_, err := Parse(ctx, config.Source())
 			require.Error(t, err)
-			assert.ErrorsIs(t, err, os.ErrNotExist)
+			assert.ErrorIs(t, err, os.ErrNotExist)
 		}
 	})
 
@@ -137,7 +137,7 @@ func TestParse(t *testing.T) {
 		{
 			_, err := Parse(ctx, config.Source())
 			require.Error(t, err)
-			assert.ErrorsContains(t, err, "expected 'package', found 'EOF'")
+			assert.ErrorContains(t, err, "expected 'package', found 'EOF'")
 		}
 	})
 
@@ -158,7 +158,7 @@ func TestParse(t *testing.T) {
 		{
 			_, err := Parse(ctx, config.Source())
 			require.Error(t, err)
-			assert.ErrorsIs(t, err, apperr.ErrDDLTagGoAnnotationNotFoundInSource)
+			assert.ErrorIs(t, err, apperr.ErrDDLTagGoAnnotationNotFoundInSource)
 		}
 	})
 }
