@@ -26,6 +26,7 @@ type config struct {
 	// Golang
 	ColumnTagGo string `json:"column_tag_go"`
 	DDLTagGo    string `json:"ddl_tag_go"`
+	PKTagGo     string `json:"pk_tag_go"`
 }
 
 //nolint:gochecknoglobals
@@ -92,6 +93,9 @@ const (
 
 	_OptionDDLTagGo = "ddl-tag-go"
 	_EnvKeyDDLTagGo = "DDLGEN_DDL_TAG_GO"
+
+	_OptionPKTagGo = "pk-tag-go"
+	_EnvKeyPKTagGo = "DDLGEN_PK_TAG_GO"
 )
 
 // MEMO: Since there is a possibility of returning some kind of error in the future, the signature is made to return an error.
@@ -156,6 +160,12 @@ func load(ctx context.Context) (cfg *config, err error) { //nolint:unparam
 				Description: "DDL annotation key for Go struct tag",
 				Default:     cliz.Default("ddlgen"),
 			},
+			&cliz.StringOption{
+				Name:        _OptionPKTagGo,
+				Environment: _EnvKeyPKTagGo,
+				Description: "primary key annotation key for Go struct tag",
+				Default:     cliz.Default("pk"),
+			},
 		},
 	}
 
@@ -173,6 +183,7 @@ func load(ctx context.Context) (cfg *config, err error) { //nolint:unparam
 		Destination: loadDestination(ctx, cmd),
 		ColumnTagGo: loadColumnTagGo(ctx, cmd),
 		DDLTagGo:    loadDDLTagGo(ctx, cmd),
+		PKTagGo:     loadPKTagGo(ctx, cmd),
 	}
 
 	if c.Debug {

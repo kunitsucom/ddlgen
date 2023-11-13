@@ -5,40 +5,39 @@
 -- User is a user.
 --
 -- spanddl:      table: `Users`
--- spanddl:     option: PRIMARY KEY (`Id`)
 -- spanddl: constraint: CONSTRAINT AgeGTEZero CHECK(Age >= 0)
 -- NOTE: the "User" struct's field "Ignore" has a tag for column name (`dbtest:"-"`), so the field is ignored.
 CREATE TABLE `Users` (
-    -- ID is a user ID.
-    `Id`    STRING(36)  NOT NULL,
+    -- UserID is a user ID.
+    `UserId` STRING(36)  NOT NULL,
     -- Name is a user name.
-    `Name`  STRING(255) NOT NULL,
+    `Name`   STRING(255) NOT NULL,
     -- Email is a user email.
-    `Email` STRING(255) NOT NULL,
+    `Email`  STRING(255) NOT NULL,
     -- Age is a user age.
-    `Age`   INT64       NOT NULL,
+    `Age`    INT64       NOT NULL,
     CONSTRAINT AgeGTEZero CHECK(Age >= 0)
 )
-PRIMARY KEY (`Id`);
+PRIMARY KEY (`UserId`);
 
--- source: spanner/integrationtest_go_001.source:9
+-- source: spanner/integrationtest_go_001.source:8
 -- spanddl:      index: CREATE INDEX `IndexUsersByName` ON Users(`Name`)
 CREATE INDEX `IndexUsersByName` ON Users(`Name`);
 
--- source: spanner/integrationtest_go_001.source:26
+-- source: spanner/integrationtest_go_001.source:25
 -- Users is a user array.
 -- This type is expected not to be detected.
 --
 -- spanddl: table: `UserArrays`
--- ERROR: the comment (spanner/integrationtest_go_001.source:23) does not have struct fields for column type and constraint (`spanddl:"<TYPE> [CONSTRAINT]"`), or the comment is not associated with struct.
+-- ERROR: the comment (spanner/integrationtest_go_001.source:22) does not have struct fields for column type and constraint (`spanddl:"<TYPE> [CONSTRAINT]"`), or the comment is not associated with struct.
 CREATE TABLE `UserArrays` (
 );
 
--- source: spanner/integrationtest_go_001.source:31
+-- source: spanner/integrationtest_go_001.source:30
 -- Group is a group.
 --
 -- spanddl:table:
--- WARN: the comment (spanner/integrationtest_go_001.source:29) does not have a key for table (spanddl: table: CREATE TABLE <table>), so the struct name "Group" is used as the table name.
+-- WARN: the comment (spanner/integrationtest_go_001.source:28) does not have a key for table (spanddl: table: CREATE TABLE <table>), so the struct name "Group" is used as the table name.
 CREATE TABLE Group (
     -- ID is a group ID.
     `Id`   STRING(36)  NOT NULL,
@@ -46,28 +45,10 @@ CREATE TABLE Group (
     `Name` STRING(255) NOT NULL
 );
 
--- source: spanner/integrationtest_go_001.source:41
--- Book is a book.
---
--- spanddl:table:`Books`
--- spanddl:options:PRIMARY KEY (`Id`)
-CREATE TABLE `Books` (
-    -- NOTE: the struct does not have a tag for column name (`dbtest:"<ColumnName>"`), so the field name "ID" is used as the column name.
-    -- ID is a book ID.
-    `ID`     STRING(36)  NOT NULL,
-    -- NOTE: the struct does not have a tag for column name (`dbtest:"<ColumnName>"`), so the field name "Title" is used as the column name.
-    -- Title is a book title.
-    `Title`  STRING(255) NOT NULL,
-    -- NOTE: the struct does not have a tag for column name (`dbtest:"<ColumnName>"`), so the field name "Author" is used as the column name.
-    -- Author is a book author.
-    `Author` STRING(255) NOT NULL
-)
-PRIMARY KEY (`Id`);
-
--- source: spanner/integrationtest_go_001.source:53
+-- source: spanner/integrationtest_go_001.source:39
 -- Author is a author.
 -- spanddl:
--- WARN: the comment (spanner/integrationtest_go_001.source:52) does not have a key for table (spanddl: table: CREATE TABLE <table>), so the struct name "Author" is used as the table name.
+-- WARN: the comment (spanner/integrationtest_go_001.source:38) does not have a key for table (spanddl: table: CREATE TABLE <table>), so the struct name "Author" is used as the table name.
 CREATE TABLE Author (
     -- ID is a author ID.
     `Id`   STRING(36)  NOT NULL,
@@ -75,7 +56,26 @@ CREATE TABLE Author (
     `Name` STRING(255) NOT NULL
 );
 
--- source: spanner/integrationtest_go_001.source:62
+-- source: spanner/integrationtest_go_001.source:49
+-- Book is a book.
+--
+-- spanddl:table:`Books`
+-- spanddl:option: INTERLEAVE IN PARENT `Author` ON DELETE CASCADE
+CREATE TABLE `Books` (
+    -- NOTE: the struct does not have a tag for column name (`dbtest:"<ColumnName>"`), so the field name "AuthorID" is used as the column name.
+    -- AuthorID is a book author.
+    `AuthorID` STRING(255) NOT NULL,
+    -- NOTE: the struct does not have a tag for column name (`dbtest:"<ColumnName>"`), so the field name "ID" is used as the column name.
+    -- ID is a book ID.
+    `ID`       STRING(36)  NOT NULL,
+    -- NOTE: the struct does not have a tag for column name (`dbtest:"<ColumnName>"`), so the field name "Title" is used as the column name.
+    -- Title is a book title.
+    `Title`    STRING(255) NOT NULL
+)
+PRIMARY KEY (`AuthorID`, `ID`),
+INTERLEAVE IN PARENT `Author` ON DELETE CASCADE;
+
+-- source: spanner/integrationtest_go_001.source:61
 -- Store
 -- spanddl: table: CREATE TABLE `Stores`
 CREATE TABLE `Stores` (
@@ -87,9 +87,9 @@ CREATE TABLE `Stores` (
     `Name` ERROR
 );
 
--- source: spanner/integrationtest_go_001.source:71
+-- source: spanner/integrationtest_go_001.source:70
 -- spanddl: index: CREATE INDEX `IndexBooksByTitle` ON Books(`Title`)
 CREATE INDEX `IndexBooksByTitle` ON Books(`Title`);
 
--- source: spanner/integrationtest_go_001.source:71
--- WARN: the comment (spanner/integrationtest_go_001.source:71) does not have a key for table (spanddl: table: CREATE TABLE <table>), or the comment is not associated with struct.
+-- source: spanner/integrationtest_go_001.source:70
+-- WARN: the comment (spanner/integrationtest_go_001.source:70) does not have a key for table (spanddl: table: CREATE TABLE <table>), or the comment is not associated with struct.

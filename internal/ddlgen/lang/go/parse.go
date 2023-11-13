@@ -163,18 +163,28 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 				case "":
 					name := field.Names[0].Name
 					column.Comments = append(column.Comments, fmt.Sprintf("NOTE: the struct does not have a tag for column name (`%s:\"<ColumnName>\"`), so the field name \"%s\" is used as the column name.", config.ColumnTagGo(), name))
-					column.Column = name
+					column.ColumnName = name
 				default:
-					column.Column = columnName
+					column.ColumnName = columnName
 				}
 
 				// column type and constraint
 				switch columnTypeConstraint := tag.Get(config.DDLTagGo()); columnTypeConstraint {
-				case "":
+				case "", "-":
 					column.Comments = append(column.Comments, fmt.Sprintf("ERROR: the struct does not have a tag for column type and constraint (`%s:\"<TYPE> [CONSTRAINT]\"`)", config.DDLTagGo()))
 					column.TypeConstraint = "ERROR"
 				default:
 					column.TypeConstraint = columnTypeConstraint
+				}
+
+				// primary key
+				switch primaryKey := tag.Get(config.PKTagGo()); primaryKey {
+				case "true", "1":
+					createTableStmt.PrimaryKey = append(createTableStmt.PrimaryKey, column.ColumnName)
+				case "", "-":
+					// do nothing
+				default:
+					column.Comments = append(column.Comments, fmt.Sprintf("WARN: the column \"%s\" does not have valid primary key tag (`%s:\"true\"`), so the column is not used as primary key.", column.ColumnName, config.PKTagGo()))
 				}
 
 				// comments

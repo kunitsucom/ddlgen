@@ -34,21 +34,36 @@ func fprintCreateTable(buf *string, indent string, stmt *ddlast.CreateTableStmt)
 		// CONSTRAINT
 		for i, constraint := range stmt.Constraints {
 			fprintCreateTableConstraint(buf, indent, constraint)
-			if lastConstraint := len(stmt.Constraints) - 1; i == lastConstraint {
-				*buf += "\n"
-			} else {
-				*buf += ",\n"
+			if lastConstraintIndex := len(stmt.Constraints) - 1; i != lastConstraintIndex {
+				*buf += ","
 			}
+			*buf += "\n"
 		}
 
 		// Right Parenthesis
 		*buf += ")"
 
+		// PRIMARY KEY
+		if len(stmt.PrimaryKey) > 0 {
+			*buf += "\n"
+			*buf += "PRIMARY KEY ("
+			for i, primaryKey := range stmt.PrimaryKey {
+				*buf += Quotation + primaryKey + Quotation
+				if lastPrimaryKeyIndex := len(stmt.PrimaryKey) - 1; i != lastPrimaryKeyIndex {
+					*buf += ", "
+				}
+			}
+			*buf += ")"
+			if hasTableOptions := len(stmt.Options) > 0; hasTableOptions {
+				*buf += ","
+			}
+		}
+
 		// OPTIONS
 		for i, option := range stmt.Options {
 			*buf += "\n"
 			fprintCreateTableOption(buf, "", option)
-			if lastOption := len(stmt.Options) - 1; i != lastOption {
+			if lastOptionIndex := len(stmt.Options) - 1; i != lastOptionIndex {
 				*buf += ","
 			}
 		}
@@ -62,7 +77,7 @@ func fprintCreateTable(buf *string, indent string, stmt *ddlast.CreateTableStmt)
 func fprintCreateTableColumn(buf *string, indent string, columns []*ddlast.CreateTableColumn, tailComma bool) {
 	columnNameMaxLength := 0
 	slicez.Each(columns, func(index int, elem *ddlast.CreateTableColumn) {
-		if columnLength := len(elem.Column); columnLength > columnNameMaxLength {
+		if columnLength := len(elem.ColumnName); columnLength > columnNameMaxLength {
 			columnNameMaxLength = columnLength
 		}
 	})
@@ -74,7 +89,7 @@ func fprintCreateTableColumn(buf *string, indent string, columns []*ddlast.Creat
 			fprintComment(buf, indent, comment)
 		}
 
-		*buf += indent + fmt.Sprintf(columnNameFormat, Quotation+column.Column+Quotation) + " " + column.TypeConstraint
+		*buf += indent + fmt.Sprintf(columnNameFormat, Quotation+column.ColumnName+Quotation) + " " + column.TypeConstraint
 
 		if lastColumn := len(columns) - 1; i == lastColumn && !tailComma {
 			*buf += "\n"
