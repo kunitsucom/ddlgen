@@ -28,6 +28,7 @@ func Test_integrationtest_go_spanner(t *testing.T) {
 			"--dialect=spanner",
 			"--column-tag-go=dbtest",
 			"--ddl-tag-go=spanddl",
+			"--pk-tag-go=pkey",
 			"--src=integrationtest_go_001.source",
 			"--dst=dummy",
 		})

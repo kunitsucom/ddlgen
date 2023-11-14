@@ -16,6 +16,7 @@ type CreateTableStmt struct {
 	Columns     []*CreateTableColumn     // ( <Column>, ...
 	Constraints []*CreateTableConstraint // <Constraint> )
 	Options     []*CreateTableOption     // <Options>;
+	PrimaryKey  []string                 // PRIMARY KEY ( <Column>, ... )
 }
 
 func (stmt *CreateTableStmt) GetSourceFile() string {
@@ -45,7 +46,7 @@ func (stmt *CreateTableStmt) SetCreateTable(createTable string) {
 
 type CreateTableColumn struct {
 	Comments       []string
-	Column         string
+	ColumnName     string
 	TypeConstraint string
 }
 

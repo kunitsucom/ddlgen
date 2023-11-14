@@ -25,31 +25,31 @@ func TestFprint(t *testing.T) {
 				CreateTable: "CREATE TABLE Spans",
 				Columns: []*ddlast.CreateTableColumn{
 					{
-						Column:         "Id",
+						ColumnName:     "Id",
 						TypeConstraint: "STRING(64) NOT NULL",
 						Comments:       []string{"Id is Spans's Id."},
 					},
 					{
-						Column:         "Name",
+						ColumnName:     "Name",
 						TypeConstraint: "STRING(100) NOT NULL",
 						Comments:       []string{"Name is Spans's Name."},
 					},
 					{
-						Column:         "Number",
+						ColumnName:     "Number",
 						TypeConstraint: "INT64 NOT NULL",
 					},
 					{
-						Column:         "Description",
+						ColumnName:     "Description",
 						TypeConstraint: "STRING(1024) NOT NULL",
 						Comments:       []string{"Description is Spans's Description."},
 					},
 					{
-						Column:         "CreatedAt",
+						ColumnName:     "CreatedAt",
 						TypeConstraint: "TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp=true)",
 						Comments:       []string{"CreatedAt is Spans's CreatedAt."},
 					},
 					{
-						Column:         "UpdatedAt",
+						ColumnName:     "UpdatedAt",
 						TypeConstraint: "TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp=true)",
 						Comments:       []string{"UpdatedAt is Spans's UpdatedAt."},
 					},
