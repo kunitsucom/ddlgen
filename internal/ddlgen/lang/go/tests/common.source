@@ -8,7 +8,7 @@ type (
 	// spanddl:      index: CREATE INDEX `IndexUsersByName` ON Users(`Name`)
 	User struct {
 		// UserID is a user ID.
-		UserID string `dbtest:"UserId" spanddl:"STRING(36)  NOT NULL" pk:"true"`
+		UserID string `dbtest:"UserId" spanddl:"STRING(36)  NOT NULL" pkey:"true"`
 		// Name is a user name.
 		Name string   `dbtest:"Name"   spanddl:"STRING(255) NOT NULL"`
 		// Email is a user email.
@@ -50,9 +50,9 @@ type (
 	// spanddl:option: INTERLEAVE IN PARENT `Author` ON DELETE CASCADE
 	Book struct {
 		// AuthorID is a book author.
-		AuthorID string `spanddl:"STRING(255) NOT NULL" pk:"true"`
+		AuthorID string `spanddl:"STRING(255) NOT NULL" pkey:"true"`
 		// ID is a book ID.
-		ID string       `spanddl:"STRING(36)  NOT NULL" pk:"true"`
+		ID string       `spanddl:"STRING(36)  NOT NULL" pkey:"true"`
 		// Title is a book title.
 		Title string    `spanddl:"STRING(255) NOT NULL"`
 	}
@@ -61,7 +61,7 @@ type (
 	// spanddl: table: CREATE TABLE `Stores`
 	Store struct {
 		// ID is a store ID.
-		ID string   `dbtest:"Id" pk:"false"`
+		ID string   `dbtest:"Id" pkey:"false"`
 		// Name is a store name.
 		Name string `dbtest:"Name"`
 	}

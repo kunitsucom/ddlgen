@@ -26,7 +26,7 @@ package sample
 // spanddl: constraint: CONSTRAINT AgeGTEZero CHECK(Age >= 0)
 // spanddl:      index: IndexUsersUsername ON Users(Username)
 type User struct {
-    UserID   int64  `db:"UserId"   spanddl:"STRING(36)  NOT NULL" pk:"true"`
+    UserID   int64  `db:"UserId"   spanddl:"STRING(36)  NOT NULL" pkey:"true"`
     Username string `db:"Username" spanddl:"STRING(255) NOT NULL"`
     Age  int64      `db:"Age"      spanddl:"INT64       NOT NULL"`
 }
@@ -36,14 +36,14 @@ type User struct {
 // spanddl:  table: CREATE TABLE IF NOT EXISTS Groups
 // spanddl:  index: CREATE UNIQUE INDEX IndexGroupsGroupName ON Groups(GroupName)
 type Group struct {
-    GroupID     int64  `db:"GroupId"     spanddl:"STRING(36)   NOT NULL" pk:"true"`
+    GroupID     int64  `db:"GroupId"     spanddl:"STRING(36)   NOT NULL" pkey:"true"`
     GroupName   string `db:"GroupName"   spanddl:"STRING(255)  NOT NULL"`
     Description string `db:"Description" spanddl:"STRING(2048) NOT NULL"`
 }
 EOF
 
 $ # == 2. generate DDL ================================
-$ ddlgen --dialect spanner --column-tag-go db --ddl-tag-go spanddl --pk-tag-go pk --src /tmp/sample.go --dst /tmp/sample.sql
+$ ddlgen --dialect spanner --column-tag-go db --ddl-tag-go spanddl --pk-tag-go pkey --src /tmp/sample.go --dst /tmp/sample.sql
 INFO: 2023/11/07 20:49:39 ddlgen.go:44: source: /tmp/sample.go
 INFO: 2023/11/07 20:49:39 ddlgen.go:73: destination: /tmp/sample.sql
 

@@ -26,6 +26,7 @@ func TestParse(t *testing.T) {
 			"--dialect=spanner",
 			"--column-tag-go=dbtest",
 			"--ddl-tag-go=spanddl",
+			"--pk-tag-go=pkey",
 			"--src=tests/common.source",
 			"--dst=dummy",
 		})
@@ -49,6 +50,7 @@ func TestParse(t *testing.T) {
 			"--dialect=spanner",
 			"--column-tag-go=dbtest",
 			"--ddl-tag-go=spanddl",
+			"--pk-tag-go=pkey",
 			"--src=tests",
 			"--dst=dummy",
 		})
@@ -85,6 +87,7 @@ func TestParse(t *testing.T) {
 			"--dialect=spanner",
 			"--column-tag-go=dbtest",
 			"--ddl-tag-go=spanddl",
+			"--pk-tag-go=pkey",
 			"--src=" + tempDir,
 			"--dst=dummy",
 		})
@@ -105,6 +108,7 @@ func TestParse(t *testing.T) {
 			"--dialect=spanner",
 			"--column-tag-go=dbtest",
 			"--ddl-tag-go=spanddl",
+			"--pk-tag-go=pkey",
 			"--src=tests/no-such-file.source",
 			"--dst=dummy",
 		})
@@ -127,6 +131,7 @@ func TestParse(t *testing.T) {
 			"--dialect=spanner",
 			"--column-tag-go=dbtest",
 			"--ddl-tag-go=spanddl",
+			"--pk-tag-go=pkey",
 			"--src=tests/no.errsource",
 			"--dst=dummy",
 		})
@@ -148,6 +153,7 @@ func TestParse(t *testing.T) {
 			"--dialect=spanner",
 			"--column-tag-go=dbtest",
 			"--ddl-tag-go=spanddl",
+			"--pk-tag-go=pkey",
 			"--src=tests/no-ddl-tag-go.source",
 			"--dst=dummy",
 		})
@@ -175,6 +181,7 @@ func Test_walkDirFn(t *testing.T) {
 			"--dialect=spanner",
 			"--column-tag-go=dbtest",
 			"--ddl-tag-go=spanddl",
+			"--pk-tag-go=pkey",
 			"--src=tests",
 			"--dst=dummy",
 		})

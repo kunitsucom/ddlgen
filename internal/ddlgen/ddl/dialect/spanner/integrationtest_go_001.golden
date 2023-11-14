@@ -80,7 +80,7 @@ INTERLEAVE IN PARENT `Author` ON DELETE CASCADE;
 -- spanddl: table: CREATE TABLE `Stores`
 CREATE TABLE `Stores` (
     -- ERROR: the "Store" struct's "ID" field does not have a tag for column type and constraint (`spanddl:"<TYPE> [CONSTRAINT]"`)
-    -- WARN: the field "ID" does not have valid primary key tag (`pk:"true"`), so the column is not used as primary key.
+    -- WARN: the field "ID" does not have valid primary key tag (`pkey:"true"`), so the column is not used as primary key.
     -- ID is a store ID.
     `Id`   ERROR,
     -- ERROR: the "Store" struct's "Name" field does not have a tag for column type and constraint (`spanddl:"<TYPE> [CONSTRAINT]"`)
