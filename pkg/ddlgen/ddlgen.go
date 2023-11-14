@@ -14,6 +14,7 @@ import (
 
 	"github.com/kunitsucom/ddlgen/internal/config"
 	ddlast "github.com/kunitsucom/ddlgen/internal/ddlgen/ddl"
+	"github.com/kunitsucom/ddlgen/internal/ddlgen/ddl/dialect/postgres"
 	"github.com/kunitsucom/ddlgen/internal/ddlgen/ddl/dialect/spanner"
 	ddlgengo "github.com/kunitsucom/ddlgen/internal/ddlgen/lang/go"
 	"github.com/kunitsucom/ddlgen/internal/logs"
@@ -98,6 +99,11 @@ func fprint(w io.Writer, ddl *ddlast.DDL) error {
 	case spanner.Dialect:
 		if err := spanner.Fprint(w, ddl); err != nil {
 			return errorz.Errorf("spanner.Fprint: %w", err)
+		}
+		return nil
+	case postgres.Dialect:
+		if err := postgres.Fprint(w, ddl); err != nil {
+			return errorz.Errorf("postgres.Fprint: %w", err)
 		}
 		return nil
 	default:

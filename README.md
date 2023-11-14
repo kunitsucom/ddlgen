@@ -22,28 +22,27 @@ package sample
 
 // User is a user model struct.
 //
-// spanddl:      table: Users
-// spanddl: constraint: CONSTRAINT AgeGTEZero CHECK(Age >= 0)
-// spanddl:      index: IndexUsersUsername ON Users(Username)
+// pgddl: table: users
+// pgddl: index: "index_users_username" ON "users" ("username")
 type User struct {
-    UserID   int64  `db:"UserId"   spanddl:"STRING(36)  NOT NULL" pk:"true"`
-    Username string `db:"Username" spanddl:"STRING(255) NOT NULL"`
-    Age  int64      `db:"Age"      spanddl:"INT64       NOT NULL"`
+    UserID   int64  `db:"user_id"  pgddl:"TEXT    NOT NULL" pk:"true"`
+    Username string `db:"username" pgddl:"TEXT    NOT NULL"`
+    Age  int64      `db:"age"      pgddl:"INTEGER NOT NULL"`
 }
 
 // Group is a group model struct.
 //
-// spanddl:  table: CREATE TABLE IF NOT EXISTS Groups
-// spanddl:  index: CREATE UNIQUE INDEX IndexGroupsGroupName ON Groups(GroupName)
+// pgddl: table: CREATE TABLE IF NOT EXISTS "groups"
+// pgddl: index: CREATE UNIQUE INDEX "index_groups_group_name" ON "groups" ("group_name")
 type Group struct {
-    GroupID     int64  `db:"GroupId"     spanddl:"STRING(36)   NOT NULL" pk:"true"`
-    GroupName   string `db:"GroupName"   spanddl:"STRING(255)  NOT NULL"`
-    Description string `db:"Description" spanddl:"STRING(2048) NOT NULL"`
+    GroupID     int64  `db:"group_id"    pgddl:"TEXT NOT NULL" pk:"true"`
+    GroupName   string `db:"group_name"  pgddl:"TEXT NOT NULL"`
+    Description string `db:"description" pgddl:"TEXT NOT NULL"`
 }
 EOF
 
 $ # == 2. generate DDL ================================
-$ ddlgen --dialect spanner --column-tag-go db --ddl-tag-go spanddl --pk-tag-go pk --src /tmp/sample.go --dst /tmp/sample.sql
+$ ddlgen --dialect postgres --column-tag-go db --ddl-tag-go pgddl --pk-tag-go pk --src /tmp/sample.go --dst /tmp/sample.sql
 INFO: 2023/11/07 20:49:39 ddlgen.go:44: source: /tmp/sample.go
 INFO: 2023/11/07 20:49:39 ddlgen.go:73: destination: /tmp/sample.sql
 
@@ -55,34 +54,32 @@ $ cat /tmp/sample.sql
 -- source: tmp/sample.go:5
 -- User is a user model struct.
 --
--- spanddl:      table: Users
--- spanddl: constraint: CONSTRAINT AgeGTEZero CHECK(Age >= 0)
-CREATE TABLE Users (
-    `UserId`   STRING(36)  NOT NULL,
-    `Username` STRING(255) NOT NULL,
-    `Age`      INT64       NOT NULL,
-    CONSTRAINT AgeGTEZero CHECK(Age >= 0)
-)
-PRIMARY KEY (`UserId`);
+-- pgddl: table: users
+CREATE TABLE users (
+    "user_id"  TEXT    NOT NULL,
+    "username" TEXT    NOT NULL,
+    "age"      INTEGER NOT NULL,
+    PRIMARY KEY ("user_id")
+);
 
--- source: tmp/sample.go:7
--- spanddl:      index: IndexUsersUsername ON Users(Username)
-CREATE INDEX IndexUsersUsername ON Users(Username);
+-- source: tmp/sample.go:6
+-- pgddl: index: "index_users_username" ON "users" ("username")
+CREATE INDEX "index_users_username" ON "users" ("username");
 
--- source: tmp/sample.go:16
+-- source: tmp/sample.go:15
 -- Group is a group model struct.
 --
--- spanddl:  table: CREATE TABLE IF NOT EXISTS Groups
-CREATE TABLE IF NOT EXISTS Groups (
-    `GroupId`     STRING(36)   NOT NULL,
-    `GroupName`   STRING(255)  NOT NULL,
-    `Description` STRING(2048) NOT NULL
-)
-PRIMARY KEY (`GroupId`);
+-- pgddl: table: CREATE TABLE IF NOT EXISTS "groups"
+CREATE TABLE IF NOT EXISTS "groups" (
+    "group_id"    TEXT NOT NULL,
+    "group_name"  TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    PRIMARY KEY ("group_id")
+);
 
--- source: tmp/sample.go:17
--- spanddl:  index: CREATE UNIQUE INDEX IndexGroupsGroupName ON Groups(GroupName)
-CREATE UNIQUE INDEX IndexGroupsGroupName ON Groups(GroupName);
+-- source: tmp/sample.go:16
+-- pgddl: index: CREATE UNIQUE INDEX "index_groups_group_name" ON "groups" ("group_name")
+CREATE UNIQUE INDEX "index_groups_group_name" ON "groups" ("group_name");
 
 ```
 
@@ -142,8 +139,8 @@ options:
 ## TODO
 
 - dialect
+  - [x] Support `postgres`
   - [x] Support `spanner`
-  - [ ] Support `postgres`
   - [ ] Support `mysql`
   - [ ] Support `sqlite3`
 - lang
