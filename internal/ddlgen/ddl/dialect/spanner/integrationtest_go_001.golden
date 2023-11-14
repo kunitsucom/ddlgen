@@ -6,7 +6,7 @@
 --
 -- spanddl:      table: `Users`
 -- spanddl: constraint: CONSTRAINT AgeGTEZero CHECK(Age >= 0)
--- NOTE: the "User" struct's field "Ignore" has a tag for column name (`dbtest:"-"`), so the field is ignored.
+-- NOTE: the "User" struct's "Ignore" field has a tag for column name (`dbtest:"-"`), so the field is ignored.
 CREATE TABLE `Users` (
     -- UserID is a user ID.
     `UserId` STRING(36)  NOT NULL,
@@ -62,13 +62,13 @@ CREATE TABLE Author (
 -- spanddl:table:`Books`
 -- spanddl:option: INTERLEAVE IN PARENT `Author` ON DELETE CASCADE
 CREATE TABLE `Books` (
-    -- NOTE: the struct does not have a tag for column name (`dbtest:"<ColumnName>"`), so the field name "AuthorID" is used as the column name.
+    -- NOTE: the "Book" struct's "AuthorID" field does not have a tag for column name (`dbtest:"<ColumnName>"`), so the field name "AuthorID" is used as the column name.
     -- AuthorID is a book author.
     `AuthorID` STRING(255) NOT NULL,
-    -- NOTE: the struct does not have a tag for column name (`dbtest:"<ColumnName>"`), so the field name "ID" is used as the column name.
+    -- NOTE: the "Book" struct's "ID" field does not have a tag for column name (`dbtest:"<ColumnName>"`), so the field name "ID" is used as the column name.
     -- ID is a book ID.
     `ID`       STRING(36)  NOT NULL,
-    -- NOTE: the struct does not have a tag for column name (`dbtest:"<ColumnName>"`), so the field name "Title" is used as the column name.
+    -- NOTE: the "Book" struct's "Title" field does not have a tag for column name (`dbtest:"<ColumnName>"`), so the field name "Title" is used as the column name.
     -- Title is a book title.
     `Title`    STRING(255) NOT NULL
 )
@@ -79,10 +79,11 @@ INTERLEAVE IN PARENT `Author` ON DELETE CASCADE;
 -- Store
 -- spanddl: table: CREATE TABLE `Stores`
 CREATE TABLE `Stores` (
-    -- ERROR: the struct does not have a tag for column type and constraint (`spanddl:"<TYPE> [CONSTRAINT]"`)
+    -- ERROR: the "Store" struct's "ID" field does not have a tag for column type and constraint (`spanddl:"<TYPE> [CONSTRAINT]"`)
+    -- WARN: the field "ID" does not have valid primary key tag (`pk:"true"`), so the column is not used as primary key.
     -- ID is a store ID.
     `Id`   ERROR,
-    -- ERROR: the struct does not have a tag for column type and constraint (`spanddl:"<TYPE> [CONSTRAINT]"`)
+    -- ERROR: the "Store" struct's "Name" field does not have a tag for column type and constraint (`spanddl:"<TYPE> [CONSTRAINT]"`)
     -- Name is a store name.
     `Name` ERROR
 );

@@ -158,11 +158,11 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 				// column name
 				switch columnName := tag.Get(config.ColumnTagGo()); columnName {
 				case "-":
-					createTableStmt.Comments = append(createTableStmt.Comments, fmt.Sprintf("NOTE: the \"%s\" struct's field \"%s\" has a tag for column name (`%s:\"-\"`), so the field is ignored.", r.TypeSpec.Name, field.Names[0], config.ColumnTagGo()))
+					createTableStmt.Comments = append(createTableStmt.Comments, fmt.Sprintf("NOTE: the \"%s\" struct's \"%s\" field has a tag for column name (`%s:\"-\"`), so the field is ignored.", r.TypeSpec.Name, field.Names[0], config.ColumnTagGo()))
 					continue
 				case "":
 					name := field.Names[0].Name
-					column.Comments = append(column.Comments, fmt.Sprintf("NOTE: the struct does not have a tag for column name (`%s:\"<ColumnName>\"`), so the field name \"%s\" is used as the column name.", config.ColumnTagGo(), name))
+					column.Comments = append(column.Comments, fmt.Sprintf("NOTE: the \"%s\" struct's \"%s\" field does not have a tag for column name (`%s:\"<ColumnName>\"`), so the field name \"%s\" is used as the column name.", r.TypeSpec.Name, field.Names[0], config.ColumnTagGo(), name))
 					column.ColumnName = name
 				default:
 					column.ColumnName = columnName
@@ -171,7 +171,7 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 				// column type and constraint
 				switch columnTypeConstraint := tag.Get(config.DDLTagGo()); columnTypeConstraint {
 				case "", "-":
-					column.Comments = append(column.Comments, fmt.Sprintf("ERROR: the struct does not have a tag for column type and constraint (`%s:\"<TYPE> [CONSTRAINT]\"`)", config.DDLTagGo()))
+					column.Comments = append(column.Comments, fmt.Sprintf("ERROR: the \"%s\" struct's \"%s\" field does not have a tag for column type and constraint (`%s:\"<TYPE> [CONSTRAINT]\"`)", r.TypeSpec.Name, field.Names[0], config.DDLTagGo()))
 					column.TypeConstraint = "ERROR"
 				default:
 					column.TypeConstraint = columnTypeConstraint
@@ -184,7 +184,7 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 				case "", "-":
 					// do nothing
 				default:
-					column.Comments = append(column.Comments, fmt.Sprintf("WARN: the column \"%s\" does not have valid primary key tag (`%s:\"true\"`), so the column is not used as primary key.", column.ColumnName, config.PKTagGo()))
+					column.Comments = append(column.Comments, fmt.Sprintf("WARN: the field \"%s\" does not have valid primary key tag (`%s:\"true\"`), so the column is not used as primary key.", field.Names[0], config.PKTagGo()))
 				}
 
 				// comments
