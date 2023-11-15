@@ -24,7 +24,10 @@ import (
 	apperr "github.com/kunitsucom/ddlgen/pkg/errors"
 )
 
-const Language = "go"
+const (
+	Language                                = "go"
+	DDLGEN_ERROR_STRUCT_FIELD_TAG_NOT_FOUND = "DDLGEN_ERROR_STRUCT_FIELD_TAG_NOT_FOUND" //nolint:revive,stylecheck
+)
 
 //nolint:cyclop
 func Parse(ctx context.Context, src string) (*ddlast.DDL, error) {
@@ -162,7 +165,7 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 					continue
 				case "":
 					name := field.Names[0].Name
-					column.Comments = append(column.Comments, fmt.Sprintf("NOTE: the \"%s\" struct's \"%s\" field does not have a tag for column name (`%s:\"<ColumnName>\"`), so the field name \"%s\" is used as the column name.", r.TypeSpec.Name, field.Names[0], config.ColumnTagGo(), name))
+					column.Comments = append(column.Comments, fmt.Sprintf("WARN: the \"%s\" struct's \"%s\" field does not have a tag for column name (`%s:\"<ColumnName>\"`), so the field name \"%s\" is used as the column name.", r.TypeSpec.Name, field.Names[0], config.ColumnTagGo(), name))
 					column.ColumnName = name
 				default:
 					column.ColumnName = columnName
@@ -172,7 +175,7 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 				switch columnTypeConstraint := tag.Get(config.DDLTagGo()); columnTypeConstraint {
 				case "", "-":
 					column.Comments = append(column.Comments, fmt.Sprintf("ERROR: the \"%s\" struct's \"%s\" field does not have a tag for column type and constraint (`%s:\"<TYPE> [CONSTRAINT]\"`)", r.TypeSpec.Name, field.Names[0], config.DDLTagGo()))
-					column.TypeConstraint = "ERROR"
+					column.TypeConstraint = DDLGEN_ERROR_STRUCT_FIELD_TAG_NOT_FOUND
 				default:
 					column.TypeConstraint = columnTypeConstraint
 				}

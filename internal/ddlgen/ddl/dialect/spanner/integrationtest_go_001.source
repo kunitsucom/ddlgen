@@ -5,7 +5,7 @@ type (
 	//
 	// spanddl:      table: `Users`
 	// spanddl: constraint: CONSTRAINT AgeGTEZero CHECK(Age >= 0)
-	// spanddl:      index: CREATE INDEX `IndexUsersByName` ON Users(`Name`)
+	// spanddl:      index: CREATE INDEX `IndexUsersByName` ON `Users` (`Name`)
 	User struct {
 		// UserID is a user ID.
 		UserID string `dbtest:"UserId" spanddl:"STRING(36)  NOT NULL" pkey:"true"`
@@ -67,4 +67,4 @@ type (
 	}
 )
 
-// spanddl: index: CREATE INDEX `IndexBooksByTitle` ON Books(`Title`)
+// spanddl: index: `IndexBooksByTitle` ON `Books` (`Title`)
