@@ -22,7 +22,7 @@ package sample
 
 // User is a user model struct.
 //
-// pgddl: table: users
+// pgddl: table: "users"
 // pgddl: index: "index_users_username" ON "users" ("username")
 type User struct {
     UserID   int64  `db:"user_id"  pgddl:"TEXT    NOT NULL" pk:"true"`
@@ -54,8 +54,8 @@ $ cat /tmp/sample.sql
 -- source: tmp/sample.go:5
 -- User is a user model struct.
 --
--- pgddl: table: users
-CREATE TABLE users (
+-- pgddl: table: "users"
+CREATE TABLE "users" (
     "user_id"  TEXT    NOT NULL,
     "username" TEXT    NOT NULL,
     "age"      INTEGER NOT NULL,
@@ -141,9 +141,9 @@ options:
 ## TODO
 
 - dialect
+  - [x] Support `mysql`
   - [x] Support `postgres`
   - [x] Support `spanner`
-  - [ ] Support `mysql`
   - [ ] Support `sqlite3`
 - lang
   - [x] Support `go`

@@ -25,10 +25,10 @@ type (
 	// spanddl: table: `UserArrays`
 	Users []*User
 
-	// Group is a group.
+	// UserGroup is a user group.
 	//
 	// spanddl:table:
-	Group struct {
+	UserGroup struct {
 		// ID is a group ID.
 		ID string   `dbtest:"Id"   spanddl:"STRING(36)  NOT NULL"`
 		// Name is a group name.

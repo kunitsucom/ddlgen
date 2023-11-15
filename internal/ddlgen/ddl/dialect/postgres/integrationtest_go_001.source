@@ -25,10 +25,10 @@ type (
 	// pgddl: table: "user_arrays"
 	Users []*User
 
-	// Group is a group.
+	// UserGroup is a user group.
 	//
-	// pgddl:table: Groups
-	Group struct {
+	// pgddl:table:
+	UserGroup struct {
 		// ID is a group ID.
 		ID string   `dbtest:"id"   pgddl:"TEXT NOT NULL"`
 		// Name is a group name.
