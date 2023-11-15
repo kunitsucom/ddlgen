@@ -88,7 +88,7 @@ CREATE UNIQUE INDEX "index_groups_group_name" ON "groups" ("group_name");
 ### pre-built binary
 
 ```bash
-VERSION=v0.0.6
+VERSION=v0.0.11
 
 # download
 curl -fLROSs https://github.com/kunitsucom/ddlgen/releases/download/${VERSION}/ddlgen_${VERSION}_darwin_arm64.zip
