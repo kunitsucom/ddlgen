@@ -34,11 +34,11 @@ CREATE TABLE `UserArrays` (
 );
 
 -- source: spanner/integrationtest_go_001.source:30
--- Group is a group.
+-- UserGroup is a user group.
 --
 -- spanddl:table:
--- WARN: the comment (spanner/integrationtest_go_001.source:28) does not have a key for table (spanddl: table: CREATE TABLE <table>), so the struct name "Group" is used as the table name.
-CREATE TABLE Group (
+-- WARN: the comment (spanner/integrationtest_go_001.source:28) does not have a key for table (spanddl: table: CREATE TABLE <table>), so the struct name "UserGroup" is used as the table name.
+CREATE TABLE UserGroup (
     -- ID is a group ID.
     `Id`   STRING(36)  NOT NULL,
     -- Name is a group name.

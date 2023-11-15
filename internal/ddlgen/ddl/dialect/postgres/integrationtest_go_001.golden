@@ -16,8 +16,8 @@ CREATE TABLE "users" (
     "email"   TEXT    NOT NULL,
     -- Age is a user age.
     "age"     INTEGER NOT NULL,
-    UNIQUE("name"),
-    PRIMARY KEY ("user_id")
+    PRIMARY KEY ("user_id"),
+    UNIQUE("name")
 );
 
 -- source: postgres/integrationtest_go_001.source:8
@@ -34,10 +34,11 @@ CREATE TABLE "user_arrays" (
 );
 
 -- source: postgres/integrationtest_go_001.source:30
--- Group is a group.
+-- UserGroup is a user group.
 --
--- pgddl:table: Groups
-CREATE TABLE Groups (
+-- pgddl:table:
+-- WARN: the comment (postgres/integrationtest_go_001.source:28) does not have a key for table (pgddl: table: CREATE TABLE <table>), so the struct name "UserGroup" is used as the table name.
+CREATE TABLE UserGroup (
     -- ID is a group ID.
     "id"   TEXT NOT NULL,
     -- Name is a group name.
