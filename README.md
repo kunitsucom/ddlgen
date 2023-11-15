@@ -132,6 +132,8 @@ options:
         column annotation key for Go struct tag
     --ddl-tag-go (env: DDLGEN_DDL_TAG_GO, default: ddlgen)
         DDL annotation key for Go struct tag
+    --pk-tag-go (env: DDLGEN_PK_TAG_GO, default: pk)
+        primary key annotation key for Go struct tag
     --help (default: false)
         show usage
 ```
