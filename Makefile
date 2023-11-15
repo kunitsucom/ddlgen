@@ -11,7 +11,6 @@ export BUILD_VERSION       = $(shell git describe --tags --exact-match HEAD 2>/d
 export BUILD_REVISION      = $(shell git rev-parse HEAD)
 export BUILD_BRANCH        = $(shell git rev-parse --abbrev-ref HEAD | tr / -)
 export BUILD_TIMESTAMP     = $(shell git log -n 1 --format='%cI')
-export GO_LDFLAGS          = "-s -w -X github.com/kunitsucom/util.go/version.version=${BUILD_VERSION} -X github.com/kunitsucom/util.go/version.revision=${BUILD_REVISION} -X github.com/kunitsucom/util.go/version.branch=${BUILD_BRANCH} -X github.com/kunitsucom/util.go/version.timestamp=${BUILD_TIMESTAMP}"
 
 .DEFAULT_GOAL := help
 .PHONY: help
@@ -91,6 +90,6 @@ release: ci ## Run goxz and gh release upload
 	@command -v goxz >/dev/null || go install github.com/Songmu/goxz/cmd/goxz@latest
 	git checkout main
 	git checkout "${GIT_TAG_LATEST}"
-	-goxz -d "${REPO_TMP_DIR}" -os=linux,darwin,windows -arch=amd64,arm64 -pv "`git describe --tags --abbrev=0`" -trimpath -build-ldflags ${GO_LDFLAGS} ./cmd/ddlgen
+	-goxz -d "${REPO_TMP_DIR}" -os=linux,darwin,windows -arch=amd64,arm64 -pv "`git describe --tags --abbrev=0`" -trimpath -build-ldflags "-s -w -X github.com/kunitsucom/util.go/version.version=${BUILD_VERSION} -X github.com/kunitsucom/util.go/version.revision=${BUILD_REVISION} -X github.com/kunitsucom/util.go/version.branch=${BUILD_BRANCH} -X github.com/kunitsucom/util.go/version.timestamp=${BUILD_TIMESTAMP}" ./cmd/ddlgen
 	-gh release upload "`git describe --tags --abbrev=0`" "${REPO_TMP_DIR}"/*"`git describe --tags --abbrev=0`"*
 	git checkout "${GIT_BRANCH_CURRENT}"
