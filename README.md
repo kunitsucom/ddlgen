@@ -22,12 +22,13 @@ package sample
 
 // User is a user model struct.
 //
-// pgddl: table: "users"
-// pgddl: index: "index_users_username" ON "users" ("username")
+// pgddl:      table: "users"
+// pgddl: constraint: UNIQUE ("username")
+// pgddl:      index: "index_users_username" ON "users" ("username")
 type User struct {
-    UserID   int64  `db:"user_id"  pgddl:"TEXT    NOT NULL" pk:"true"`
-    Username string `db:"username" pgddl:"TEXT    NOT NULL"`
-    Age  int64      `db:"age"      pgddl:"INTEGER NOT NULL"`
+    UserID   string `db:"user_id"  pgddl:"TEXT NOT NULL" pk:"true"`
+    Username string `db:"username" pgddl:"TEXT NOT NULL"`
+    Age      int    `db:"age"      pgddl:"INT  NOT NULL"`
 }
 
 // Group is a group model struct.
@@ -35,7 +36,7 @@ type User struct {
 // pgddl: table: CREATE TABLE IF NOT EXISTS "groups"
 // pgddl: index: CREATE UNIQUE INDEX "index_groups_group_name" ON "groups" ("group_name")
 type Group struct {
-    GroupID     int64  `db:"group_id"    pgddl:"TEXT NOT NULL" pk:"true"`
+    GroupID     string `db:"group_id"    pgddl:"TEXT NOT NULL" pk:"true"`
     GroupName   string `db:"group_name"  pgddl:"TEXT NOT NULL"`
     Description string `db:"description" pgddl:"TEXT NOT NULL"`
 }
@@ -43,8 +44,8 @@ EOF
 
 $ # == 2. generate DDL ================================
 $ ddlgen --dialect postgres --column-tag-go db --ddl-tag-go pgddl --pk-tag-go pk --src /tmp/sample.go --dst /tmp/sample.sql
-INFO: 2023/11/07 20:49:39 ddlgen.go:44: source: /tmp/sample.go
-INFO: 2023/11/07 20:49:39 ddlgen.go:73: destination: /tmp/sample.sql
+INFO: 2023/11/16 16:10:39 ddlgen.go:44: source: /tmp/sample.go
+INFO: 2023/11/16 16:10:39 ddlgen.go:73: destination: /tmp/sample.sql
 
 $ # == 3. Check generated DDL ================================
 $ cat /tmp/sample.sql
@@ -54,19 +55,21 @@ $ cat /tmp/sample.sql
 -- source: tmp/sample.go:5
 -- User is a user model struct.
 --
--- pgddl: table: "users"
+-- pgddl:      table: "users"
+-- pgddl: constraint: UNIQUE ("username")
 CREATE TABLE "users" (
-    "user_id"  TEXT    NOT NULL,
-    "username" TEXT    NOT NULL,
-    "age"      INTEGER NOT NULL,
-    PRIMARY KEY ("user_id")
+    "user_id"  TEXT NOT NULL,
+    "username" TEXT NOT NULL,
+    "age"      INT  NOT NULL,
+    PRIMARY KEY ("user_id"),
+    UNIQUE ("username")
 );
 
--- source: tmp/sample.go:6
--- pgddl: index: "index_users_username" ON "users" ("username")
+-- source: tmp/sample.go:7
+-- pgddl:      index: "index_users_username" ON "users" ("username")
 CREATE INDEX "index_users_username" ON "users" ("username");
 
--- source: tmp/sample.go:15
+-- source: tmp/sample.go:16
 -- Group is a group model struct.
 --
 -- pgddl: table: CREATE TABLE IF NOT EXISTS "groups"
@@ -77,7 +80,7 @@ CREATE TABLE IF NOT EXISTS "groups" (
     PRIMARY KEY ("group_id")
 );
 
--- source: tmp/sample.go:16
+-- source: tmp/sample.go:17
 -- pgddl: index: CREATE UNIQUE INDEX "index_groups_group_name" ON "groups" ("group_name")
 CREATE UNIQUE INDEX "index_groups_group_name" ON "groups" ("group_name");
 
