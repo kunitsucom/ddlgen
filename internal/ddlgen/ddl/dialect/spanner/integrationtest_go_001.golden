@@ -59,8 +59,8 @@ CREATE TABLE Author (
 -- source: spanner/integrationtest_go_001.source:49
 -- Book is a book.
 --
--- spanddl:table:`Books`
--- spanddl:option: INTERLEAVE IN PARENT `Author` ON DELETE CASCADE
+-- spanddl:table `Books`
+-- spanddl:option INTERLEAVE IN PARENT `Author` ON DELETE CASCADE
 CREATE TABLE `Books` (
     -- WARN: the "Book" struct's "AuthorID" field does not have a tag for column name (`dbtest:"<ColumnName>"`), so the field name "AuthorID" is used as the column name.
     -- AuthorID is a book author.

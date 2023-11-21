@@ -22,9 +22,9 @@ package sample
 
 // User is a user model struct.
 //
-// pgddl:      table: "users"
-// pgddl: constraint: UNIQUE ("username")
-// pgddl:      index: "index_users_username" ON "users" ("username")
+//pgddl:table "users"
+//pgddl:constraint UNIQUE ("username")
+//pgddl:index "index_users_username" ON "users" ("username")
 type User struct {
     UserID   string `db:"user_id"  pgddl:"TEXT NOT NULL" pk:"true"`
     Username string `db:"username" pgddl:"TEXT NOT NULL"`
@@ -33,8 +33,8 @@ type User struct {
 
 // Group is a group model struct.
 //
-// pgddl: table: CREATE TABLE IF NOT EXISTS "groups"
-// pgddl: index: CREATE UNIQUE INDEX "index_groups_group_name" ON "groups" ("group_name")
+//pgddl:table CREATE TABLE IF NOT EXISTS "groups"
+//pgddl:index CREATE UNIQUE INDEX "index_groups_group_name" ON "groups" ("group_name")
 type Group struct {
     GroupID     string `db:"group_id"    pgddl:"TEXT NOT NULL" pk:"true"`
     GroupName   string `db:"group_name"  pgddl:"TEXT NOT NULL"`
@@ -55,8 +55,8 @@ $ cat /tmp/sample.sql
 -- source: tmp/sample.go:5
 -- User is a user model struct.
 --
--- pgddl:      table: "users"
--- pgddl: constraint: UNIQUE ("username")
+-- pgddl:table "users"
+-- pgddl:constraint UNIQUE ("username")
 CREATE TABLE "users" (
     "user_id"  TEXT NOT NULL,
     "username" TEXT NOT NULL,
@@ -66,13 +66,13 @@ CREATE TABLE "users" (
 );
 
 -- source: tmp/sample.go:7
--- pgddl:      index: "index_users_username" ON "users" ("username")
+-- pgddl:index "index_users_username" ON "users" ("username")
 CREATE INDEX "index_users_username" ON "users" ("username");
 
 -- source: tmp/sample.go:16
 -- Group is a group model struct.
 --
--- pgddl: table: CREATE TABLE IF NOT EXISTS "groups"
+-- pgddl:table CREATE TABLE IF NOT EXISTS "groups"
 CREATE TABLE IF NOT EXISTS "groups" (
     "group_id"    TEXT NOT NULL,
     "group_name"  TEXT NOT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS "groups" (
 );
 
 -- source: tmp/sample.go:17
--- pgddl: index: CREATE UNIQUE INDEX "index_groups_group_name" ON "groups" ("group_name")
+-- pgddl:index CREATE UNIQUE INDEX "index_groups_group_name" ON "groups" ("group_name")
 CREATE UNIQUE INDEX "index_groups_group_name" ON "groups" ("group_name");
 
 ```
