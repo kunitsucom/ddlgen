@@ -12,9 +12,11 @@ import (
 	"reflect"
 	"sort"
 	"strings"
+	"unicode"
 
 	errorz "github.com/kunitsucom/util.go/errors"
 	filepathz "github.com/kunitsucom/util.go/path/filepath"
+	slicez "github.com/kunitsucom/util.go/slices"
 
 	"github.com/kunitsucom/ddlgen/internal/config"
 	ddlast "github.com/kunitsucom/ddlgen/internal/ddlgen/ddl"
@@ -110,7 +112,9 @@ func parseFile(ctx context.Context, filename string) ([]ddlast.Stmt, error) {
 		createTableStmt.SourceLine = r.Position.Line
 
 		// CREATE TABLE (or INDEX) / CONSTRAINT / OPTIONS (from comments)
-		comments := strings.Split(strings.Trim(r.CommentGroup.Text(), "\n"), "\n")
+		comments := slicez.Select(r.CommentGroup.List, func(_ int, comment *ast.Comment) string {
+			return strings.TrimLeftFunc(strings.TrimPrefix(strings.TrimPrefix(strings.TrimPrefix(comment.Text, "//"), "/*"), "*/"), unicode.IsSpace)
+		})
 		for _, comment := range comments {
 			logs.Debug.Printf("[COMMENT DETECTED]: %s:%d: %s", createTableStmt.SourceFile, createTableStmt.SourceLine, comment)
 
