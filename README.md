@@ -91,7 +91,7 @@ CREATE UNIQUE INDEX "index_groups_group_name" ON "groups" ("group_name");
 ### pre-built binary
 
 ```bash
-VERSION=v0.0.12
+VERSION=v0.0.13
 
 # download
 curl -fLROSs https://github.com/kunitsucom/ddlgen/releases/download/${VERSION}/ddlgen_${VERSION}_darwin_arm64.zip
@@ -103,7 +103,7 @@ unzip -j ddlgen_${VERSION}_darwin_arm64.zip '*/ddlgen'
 ### go install
 
 ```bash
-go install github.com/kunitsucom/ddlgen/cmd/ddlgen@latest
+go install github.com/kunitsucom/ddlgen/cmd/ddlgen@v0.0.13
 ```
 
 ## Usage
