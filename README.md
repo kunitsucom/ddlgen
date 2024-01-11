@@ -1,3 +1,6 @@
+> [!Caution]
+> # This project has been moved to [`ddlctl`](https://github.com/kunitsucom/ddlctl)
+
 # [ddlgen](https://github.com/kunitsucom/ddlgen)
 
 [![license](https://img.shields.io/github/license/kunitsucom/ddlgen)](LICENSE)
